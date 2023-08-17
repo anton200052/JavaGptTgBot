@@ -3,3 +3,5 @@
 .idea
 *.properties
 *.txt
+out/
+src/main/resources

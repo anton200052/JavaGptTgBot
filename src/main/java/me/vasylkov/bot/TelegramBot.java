@@ -31,18 +31,18 @@ public class TelegramBot extends TelegramLongPollingBot
         return userList;
     }
 
-    private static final Properties configProperties = PropertiesLoader.getConfigProperties();
+    private static final Properties configProperties = PropertiesManager.getConfigProperties();
 
     @Override
     public String getBotUsername()
     {
-        return configProperties.getProperty("tg_bot_username");
+        return configProperties.getProperty("tgBot.username");
     }
 
     @Override
     public String getBotToken()
     {
-        return configProperties.getProperty("tg_bot_token");
+        return configProperties.getProperty("tgBot.token");
     }
     @Override
     public void onUpdateReceived(Update update)

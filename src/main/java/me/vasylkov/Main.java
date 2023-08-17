@@ -1,13 +1,11 @@
 package me.vasylkov;
 
 import me.vasylkov.bot.NotValidConfigDataException;
-import me.vasylkov.bot.PropertiesLoader;
+import me.vasylkov.bot.PropertiesManager;
 import me.vasylkov.bot.TelegramBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-
-import java.nio.file.Path;
 
 public class Main
 {
@@ -15,7 +13,7 @@ public class Main
     {
         try
         {
-            PropertiesLoader.loadConfigProperties();
+            PropertiesManager.loadConfigProperties();
         }
         catch (NotValidConfigDataException e)
         {
@@ -23,6 +21,7 @@ public class Main
             return;
         }
 
+        PropertiesManager.loadMsgBundles();
         setupBot();
     }
 

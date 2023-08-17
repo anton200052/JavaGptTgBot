@@ -24,9 +24,9 @@ public class ChatRequest
     private static final Encoding enc = Encodings.newDefaultEncodingRegistry().getEncodingForModel(ModelType.GPT_4);
     public static final Integer GPT3_MAX_TOKENS = 9000;
     public static final Integer GPT4_MAX_TOKENS = 1000;
-    private static final Properties configProperties = PropertiesLoader.getConfigProperties();
-    private static final String GPT_3_TOKEN = configProperties.getProperty("openai_gpt3_token");
-    private static final String GPT_4_TOKEN = configProperties.getProperty("openai_gpt4_token");
+    private static final Properties configProperties = PropertiesManager.getConfigProperties();
+    private static final String GPT_3_TOKEN = configProperties.getProperty("openAiGpt3.token");
+    private static final String GPT_4_TOKEN = configProperties.getProperty("openAiGpt4.token");
 
     public ChatRequest(TelegramBotUser user, String message, GptModels model)
     {
