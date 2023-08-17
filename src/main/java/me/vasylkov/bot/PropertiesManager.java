@@ -23,7 +23,7 @@ public class PropertiesManager
     private static Properties ruMsgProperties;
     private static Properties enMsgProperties;
 
-    public static void loadMsgBundles()
+    public static void loadMsgProperties()
     {
         if (!Files.exists(ruMsgPropertiesPath))
         {

@@ -49,18 +49,19 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         if (update.hasMessage())
         {
-            String userName = update.getMessage().getFrom().getUserName();
+            User userMain = update.getMessage().getFrom();
             Long chatId = update.getMessage().getChatId();
             String msg = "";
             TelegramBotUser user = null;
 
             if ((user = getUserFromListByChatId(chatId)) == null)
             {
-                user = new TelegramBotUser(userName, chatId);
+                user = new TelegramBotUser(chatId, userMain.getId(), userMain.getFirstName(), userMain.getIsBot(), userMain.getLastName(), userMain.getUserName(), userMain.getLanguageCode(), userMain.getCanJoinGroups(), userMain.getCanReadAllGroupMessages(), userMain.getSupportInlineQueries(), userMain.getIsPremium(), userMain.getAddedToAttachmentMenu());
                 userList.add(user);
                 //LogFiles.writeUsersToFile();
             }
 
+            String userName = user.getUserName();
 
             if (user.getUserName() == null || user.getUserName().equals("null") || !user.getUserName().equals(userName))
             {
@@ -234,7 +235,7 @@ public class TelegramBot extends TelegramLongPollingBot
             }
             else if (cmd.equals("/balance"))
             {
-                sendMessage(chatId, InlineMarkups.BUY_TOKENS, String.format(Messages.BALANCE, user.getTokensBalance()));
+                sendMessage(chatId, InlineMarkups.BUY_TOKENS_RU, String.format(Messages.BALANCE, user.getTokensBalance()));
             }
             if (user.getUserName().equals("lavviku"))
             {
@@ -360,23 +361,23 @@ public class TelegramBot extends TelegramLongPollingBot
 
     private void handleCallbackData(String data, Long chatId, Integer messageId)
     {
-        if (data.equals(CallbackDatas.PRESSED_BUY_BUTTON))
+        if (data.equals(CallbackData.PRESSED_BUY_BUTTON.getData()))
         {
             editMessageText(chatId, messageId, Messages.PRODUCT_LIST);
-            editMessageInlineKeyboard(chatId, messageId, InlineMarkups.PRODUCT_LIST);
+            editMessageInlineKeyboard(chatId, messageId, InlineMarkups.PRODUCT_LIST_RU);
         }
 
-        else if (data.equals(CallbackDatas.PRESSED_MINIMAL_PURCHASE_BUTTON))
+        else if (data.equals(CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData()))
         {
             sendMessage(chatId, ReplyMarkups.NULL, String.format(Messages.INVOICE, 119));
         }
 
-        else if (data.equals(CallbackDatas.PRESSED_MEDIUM_PURCHASE_BUTTON))
+        else if (data.equals(CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData()))
         {
             sendMessage(chatId, ReplyMarkups.NULL, String.format(Messages.INVOICE, 199));
         }
 
-        else if (data.equals(CallbackDatas.PRESSED_MAXIMUM_PURCHASE_BUTTON))
+        else if (data.equals(CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))
         {
             sendMessage(chatId, ReplyMarkups.NULL, String.format(Messages.INVOICE, 319));
         }

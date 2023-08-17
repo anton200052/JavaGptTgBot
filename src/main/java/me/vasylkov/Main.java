@@ -21,7 +21,7 @@ public class Main
             return;
         }
 
-        PropertiesManager.loadMsgBundles();
+        PropertiesManager.loadMsgProperties();
         setupBot();
     }
 

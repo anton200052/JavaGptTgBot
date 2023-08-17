@@ -1,21 +1,23 @@
 package me.vasylkov.bot;
 
 import com.theokanning.openai.completion.chat.ChatMessage;
+import org.telegram.telegrambots.meta.api.objects.User;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TelegramBotUser
+public class TelegramBotUser extends User
 {
-    private Long chatId;
+    private final Long chatId;
     private Integer tokensBalance = 0;
     private UserStatus currentStatus = UserStatus.MAIN_MENU;
-    private String userName;
-    private List<ChatMessage> messageList = new ArrayList<>();
+    private final List<ChatMessage> messageList = new ArrayList<>();
 
-    public TelegramBotUser(String userName, Long chatId)
+    public TelegramBotUser(Long chatId, Long id, String firstName, Boolean isBot, String lastName, String userName,
+                           String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries,
+                           Boolean isPremium, Boolean addedToAttachmentMenu)
     {
-        this.userName = userName;
+        super(id, firstName, isBot, lastName, userName, languageCode, canJoinGroups, canReadAllGroupMessages, supportInlineQueries, isPremium, addedToAttachmentMenu);
         this.chatId = chatId;
     }
 
@@ -32,16 +34,6 @@ public class TelegramBotUser
     public Long getChatId()
     {
         return chatId;
-    }
-
-    public String getUserName()
-    {
-        return userName;
-    }
-
-    public void setUserName(String userName)
-    {
-        this.userName = userName;
     }
 
     public void setCurrentStatus(UserStatus currentStatus)
