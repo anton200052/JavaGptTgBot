@@ -11,16 +11,18 @@ public class TelegramBotUser extends User
 {
     private Properties msgProperties;
     private final Long chatId;
+    private LanguageCodes language;
     private Integer tokensBalance = 0;
     private UserStatus currentStatus = UserStatus.MAIN_MENU;
     private final List<ChatMessage> messageList = new ArrayList<>();
 
-    public TelegramBotUser(Properties msgProperties, Long chatId, Long id, String firstName, Boolean isBot, String lastName, String userName,
+    public TelegramBotUser(LanguageCodes language, Properties msgProperties, Long chatId, Long id, String firstName, Boolean isBot, String lastName, String userName,
                            String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries,
                            Boolean isPremium, Boolean addedToAttachmentMenu)
     {
         super(id, firstName, isBot, lastName, userName, languageCode, canJoinGroups, canReadAllGroupMessages, supportInlineQueries, isPremium, addedToAttachmentMenu);
         this.chatId = chatId;
+        this.language = language;
         this.msgProperties = msgProperties;
     }
 
@@ -33,6 +35,11 @@ public class TelegramBotUser extends User
     public Properties getMsgProperties()
     {
         return msgProperties;
+    }
+
+    public LanguageCodes getLanguage()
+    {
+        return language;
     }
 
     public void setMsgProperties(Properties msgProperties)

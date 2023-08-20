@@ -15,19 +15,19 @@ public class ReplyMarkups
     private static final Properties ruMsgProperties = PropertiesManager.getRuMsgProperties();
     private static final Properties enMsgProperties = PropertiesManager.getEnMsgProperties();
 
-    public static final ReplyKeyboardMarkup PREVIOUS;
-    public static final ReplyKeyboardMarkup EMPTY;
+    private static final ReplyKeyboardMarkup PREVIOUS;
+    private static final ReplyKeyboardMarkup EMPTY;
 
-    public static final InlineKeyboardMarkup INLINE_BUY_TOKENS_RU;
-    public static final InlineKeyboardMarkup INLINE_PRODUCT_LIST_RU;
-    public static final InlineKeyboardMarkup INLINE_BUY_TOKENS_EN;
-    public static final InlineKeyboardMarkup INLINE_PRODUCT_LIST_EN;
+    private static final InlineKeyboardMarkup INLINE_BUY_TOKENS_RU;
+    private static final InlineKeyboardMarkup INLINE_PRODUCT_LIST_RU;
+    private static final InlineKeyboardMarkup INLINE_BUY_TOKENS_EN;
+    private static final InlineKeyboardMarkup INLINE_PRODUCT_LIST_EN;
 
 
-    public static final ReplyKeyboardMarkup REPLY_MODEL_CHOSE_RU;
-    public static final ReplyKeyboardMarkup REPLY_CHAT_MENU_RU;
-    public static final ReplyKeyboardMarkup REPLY_MODEL_CHOSE_EN;
-    public static final ReplyKeyboardMarkup REPLY_CHAT_MENU_EN;
+    private static final ReplyKeyboardMarkup REPLY_MODEL_CHOOSE_RU;
+    private static final ReplyKeyboardMarkup REPLY_CHAT_MENU_RU;
+    private static final ReplyKeyboardMarkup REPLY_MODEL_CHOOSE_EN;
+    private static final ReplyKeyboardMarkup REPLY_CHAT_MENU_EN;
 
 
     static
@@ -40,9 +40,9 @@ public class ReplyMarkups
         INLINE_PRODUCT_LIST_RU = createInlineMarkup(Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData())));
         INLINE_PRODUCT_LIST_EN = createInlineMarkup(Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData())));
 
-        REPLY_MODEL_CHOSE_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
+        REPLY_MODEL_CHOOSE_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
         REPLY_CHAT_MENU_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty()));
-        REPLY_MODEL_CHOSE_EN = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
+        REPLY_MODEL_CHOOSE_EN = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
         REPLY_CHAT_MENU_EN = createOneRowReplyMarkup(enMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty()), enMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty()));
     }
 
@@ -80,5 +80,63 @@ public class ReplyMarkups
         keyboardMarkup.setKeyboard(keyboardRowList);
         keyboardMarkup.setResizeKeyboard(true);
         return keyboardMarkup;
+    }
+
+    public static ReplyKeyboardMarkup getEMPTY()
+    {
+        return EMPTY;
+    }
+
+    public static ReplyKeyboardMarkup getPREVIOUS()
+    {
+        return PREVIOUS;
+    }
+
+    public static InlineKeyboardMarkup getInlineBuyTokens(LanguageCodes languageCode)
+    {
+        if (languageCode.equals(LanguageCodes.EN))
+        {
+            return INLINE_BUY_TOKENS_EN;
+        }
+        else
+        {
+            return INLINE_BUY_TOKENS_RU;
+        }
+    }
+
+    public static InlineKeyboardMarkup getInlineProductList(LanguageCodes languageCode)
+    {
+        if (languageCode.equals(LanguageCodes.EN))
+        {
+            return INLINE_PRODUCT_LIST_EN;
+        }
+        else
+        {
+            return INLINE_PRODUCT_LIST_RU;
+        }
+    }
+
+    public static ReplyKeyboardMarkup getReplyModelChoose(LanguageCodes languageCode)
+    {
+        if (languageCode.equals(LanguageCodes.EN))
+        {
+            return REPLY_MODEL_CHOOSE_EN;
+        }
+        else
+        {
+            return REPLY_MODEL_CHOOSE_RU;
+        }
+    }
+
+    public static ReplyKeyboardMarkup getReplyChatMenu(LanguageCodes languageCode)
+    {
+        if (languageCode.equals(LanguageCodes.EN))
+        {
+            return REPLY_CHAT_MENU_EN;
+        }
+        else
+        {
+            return REPLY_CHAT_MENU_RU;
+        }
     }
 }

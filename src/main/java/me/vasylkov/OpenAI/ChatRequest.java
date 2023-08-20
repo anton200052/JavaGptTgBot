@@ -57,7 +57,7 @@ public class ChatRequest
         {
             synchronized (user.getMessageList())
             {
-                int waitMsgId = instance.sendMessage(chatId, ReplyMarkups.PREVIOUS, Messages.REQUEST_WAITING);
+                int waitMsgId = instance.sendMessage(chatId, ReplyMarkups.getPREVIOUS(), user.getMsgProperties().getProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty()));
                 if (!isException)
                 {
                     //LogFiles.writeToRequestLog(user, message, model);
@@ -78,7 +78,7 @@ public class ChatRequest
                 ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder().model(model.equals(GptModels.GPT3) ? "gpt-3.5-turbo-16k" : "gpt-4").messages(user.getMessageList()).n(1).maxTokens(tokens).logitBias(new HashMap<>()).build();
                 List<ChatCompletionChoice> choices = service.createChatCompletion(chatCompletionRequest).getChoices();
                 instance.deleteMessage(user.getChatId(), waitMsgId);
-                instance.sendMessage(chatId, ReplyMarkups.CHAT_MENU, choices.get(0).getMessage().getContent());
+                instance.sendMessage(chatId, ReplyMarkups.getReplyChatMenu(user.getLanguage()), choices.get(0).getMessage().getContent());
 
                 if (model.equals(GptModels.GPT4))
                 {
@@ -98,7 +98,7 @@ public class ChatRequest
             }
             else
             {
-                instance.sendMessage(chatId, ReplyMarkups.NULL, Messages.REQUEST_ERROR);
+                instance.sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
                 return;
             }
         }
