@@ -1,13 +1,22 @@
 package me.vasylkov.bot;
 
-public enum PropertyKeys
+public enum PropertiesKeys
 {
+    CONFIG_BOT_USERNAME("config.botUsername"),
+    CONFIG_BOT_TOKEN("config.botToken"),
+    CONFIG_GPT3_TOKEN("config.gpt3Token"),
+    CONFIG_GPT4_TOKEN("config.gpt4Token"),
+    CONFIG_ADMINS_ID("config.adminsId"),
     ADMIN_PRINT_USER_DATA("admin.printUserData"),
     ADMIN_SEND_MESSAGE_TO_ALL("admin.sendMessageToAll"),
     ADMIN_TOKENS_ADDED("admin.tokensHasBeAdded"),
     ADMIN_USER_NOT_FOUND("admin.userNotFound"),
     ADMIN_USER_SEND_PHOTO("admin.userSendPhoto"),
     CHAT_REQUEST_WAITING("chat.requestWaiting"),
+    CHAT_GPT3_TITLE("chat.gpt3Title"),
+    CHAT_GPT4_TITLE("chat.gpt4Title"),
+    CHAT_END_CHAT("chat.endChat"),
+    CHAT_START_NEW_CHAT("chat.startNewChat"),
     ERROR_ADMIN_MODE_PARSE("error.adminModeParse"),
     ERROR_INCORRECT_INPUT("error.incorrectInput"),
     ERROR_INCORRECT_MODEL("error.incorrectModel"),
@@ -35,7 +44,7 @@ public enum PropertyKeys
 
     private final String property;
 
-    PropertyKeys(String property)
+    PropertiesKeys(String property)
     {
         this.property = property;
     }
