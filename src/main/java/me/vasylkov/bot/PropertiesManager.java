@@ -131,6 +131,8 @@ public class PropertiesManager
                 """);
 
         // menu
+        properties.setProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty(), "Выберите язык интерфейса");
+        properties.setProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty(), "RU");
         properties.setProperty("menu.modelChoose", "Выберите модель чата в навигационном меню.\nGPT-3.5: Бесплатно");
         properties.setProperty("menu.startedGpt3Chat", "Вы успешно начали чат с моделью GPT-3.5.");
         properties.setProperty("menu.startedGpt4Chat", "Вы успешно начали чат с моделью GPT-4. Генерация ответа занимает до 2 минут.");
@@ -257,6 +259,8 @@ public class PropertiesManager
                 """);
 
         //menu
+        properties.setProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty(), "Choose interface language");
+        properties.setProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty(), "EN");
         properties.setProperty("menu.modelChoose", "Choose a chat model in the navigation menu.\nGPT-3.5: Free");
         properties.setProperty("menu.startedGpt3Chat", "You have successfully started a chat with the GPT-3.5 model.");
         properties.setProperty("menu.startedGpt4Chat", "You have successfully started a chat with the GPT-4 model. Response generation takes up to 2 minutes");

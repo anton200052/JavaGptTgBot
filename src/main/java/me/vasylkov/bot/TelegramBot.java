@@ -36,6 +36,11 @@ public class TelegramBot extends TelegramLongPollingBot
         return usersList;
     }
 
+    public static void setUsersList(List<TelegramBotUser> usersList)
+    {
+        TelegramBot.usersList = usersList;
+    }
+
     @Override
     public String getBotUsername()
     {
@@ -65,7 +70,7 @@ public class TelegramBot extends TelegramLongPollingBot
             {
                 user = new TelegramBotUser(tempCode, temp, chatId, tempUser.getId(), tempUser.getFirstName(), tempUser.getIsBot(), tempUser.getLastName(), tempUser.getUserName(), tempUser.getLanguageCode(), tempUser.getCanJoinGroups(), tempUser.getCanReadAllGroupMessages(), tempUser.getSupportInlineQueries(), tempUser.getIsPremium(), tempUser.getAddedToAttachmentMenu());
                 usersList.add(user);
-                //LogFiles.writeUsersToFile();
+                DataSerializer.serializeUsersList();
             }
 
 
@@ -212,8 +217,8 @@ public class TelegramBot extends TelegramLongPollingBot
         {
             if (cmd.equals("/start"))
             {
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_START_1.getProperty()));
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_START_2.getProperty()));
+                user.setCurrentStatus(UserStatus.CHOOSE_LANGUAGE);
+                sendMessage(chatId, ReplyMarkups.getReplyChooseLanguage(), PropertiesManager.getEnMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()) + " / " + PropertiesManager.getRuMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()));
             }
             else if (cmd.equals("/help"))
             {
@@ -223,7 +228,7 @@ public class TelegramBot extends TelegramLongPollingBot
             else if (cmd.equals("/startchat"))
             {
                 sendMessage(chatId, ReplyMarkups.getReplyModelChoose(language), user.getMsgProperties().getProperty(PropertiesKeys.MENU_MODEL_CHOOSE.getProperty()));
-                user.setCurrentStatus(UserStatus.MODEL_CHOOSE);
+                user.setCurrentStatus(UserStatus.CHOOSE_MODEL);
             }
             else if (cmd.equals("/balance"))
             {
@@ -254,7 +259,7 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         LanguageCodes language = user.getLanguage();
         Long chatId = user.getChatId();
-        if (user.getCurrentStatus().equals(UserStatus.MODEL_CHOOSE))
+        if (user.getCurrentStatus().equals(UserStatus.CHOOSE_MODEL))
         {
             if (msg.equals(user.getMsgProperties().getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty())))
             {
@@ -300,7 +305,7 @@ public class TelegramBot extends TelegramLongPollingBot
 
                 u.setTokensBalance(u.getTokensBalance() + tokensToAdd);
 
-                //LogFiles.writeUsersToFile();
+                DataSerializer.serializeUsersList();
                 sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ADMIN_TOKENS_ADDED.getProperty()));
                 user.setCurrentStatus(UserStatus.MAIN_MENU);
             }
@@ -329,7 +334,7 @@ public class TelegramBot extends TelegramLongPollingBot
             else if (msg.equals(user.getMsgProperties().getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty())))
             {
                 user.getMessageList().clear();
-                user.setCurrentStatus(UserStatus.MODEL_CHOOSE);
+                user.setCurrentStatus(UserStatus.CHOOSE_MODEL);
                 sendMessage(chatId, ReplyMarkups.getReplyModelChoose(language), user.getMsgProperties().getProperty(PropertiesKeys.MENU_MODEL_CHOOSE.getProperty()));
                 return;
             }
@@ -345,6 +350,25 @@ public class TelegramBot extends TelegramLongPollingBot
                 chatRequest = new ChatRequest(user, msg, GptModels.GPT4);
                 chatRequest.sendNewChatRequest(this, ChatRequest.GPT4_MAX_TOKENS);
             }
+        }
+
+        else if (user.getCurrentStatus().equals(UserStatus.CHOOSE_LANGUAGE))
+        {
+            if (msg.equals(LanguageCodes.RU.getLanguageTitle()))
+            {
+                user.setLanguage(LanguageCodes.RU);
+                user.setMsgProperties(PropertiesManager.getRuMsgProperties());
+            }
+            else if (msg.equals(LanguageCodes.EN.getLanguageTitle()))
+            {
+                user.setLanguage(LanguageCodes.EN);
+                user.setMsgProperties(PropertiesManager.getEnMsgProperties());
+            }
+
+            DataSerializer.serializeUsersList();
+            sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_START_1.getProperty()));
+            sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_START_2.getProperty()));
+            user.setCurrentStatus(UserStatus.MAIN_MENU);
         }
 
         else

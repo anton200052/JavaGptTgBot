@@ -1,6 +1,7 @@
 # Project exclude paths
 /target/
 .idea
+*.bin
 *.properties
 *.txt
 out/

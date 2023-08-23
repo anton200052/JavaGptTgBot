@@ -1,5 +1,5 @@
 package me.vasylkov;
-
+import me.vasylkov.bot.DataSerializer;
 import me.vasylkov.bot.NotValidConfigDataException;
 import me.vasylkov.bot.PropertiesManager;
 import me.vasylkov.bot.TelegramBot;
@@ -10,6 +10,11 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class Main
 {
     public static void main(String[] args)
+    {
+        setupBot();
+    }
+
+    private static void setupBot()
     {
         try
         {
@@ -22,11 +27,12 @@ public class Main
         }
 
         PropertiesManager.loadMsgProperties();
-        setupBot();
-    }
 
-    private static void setupBot()
-    {
+
+        DataSerializer.loadStorageFile();
+        DataSerializer.deserializeUsersList();
+
+
         TelegramBotsApi api = null;
         try
         {
@@ -37,5 +43,6 @@ public class Main
         {
             throw new RuntimeException(e);
         }
+
     }
 }

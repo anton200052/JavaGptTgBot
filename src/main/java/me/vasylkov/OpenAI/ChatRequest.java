@@ -25,8 +25,8 @@ public class ChatRequest
     public static final Integer GPT3_MAX_TOKENS = 9000;
     public static final Integer GPT4_MAX_TOKENS = 1000;
     private static final Properties configProperties = PropertiesManager.getConfigProperties();
-    private static final String GPT_3_TOKEN = configProperties.getProperty("openAiGpt3.token");
-    private static final String GPT_4_TOKEN = configProperties.getProperty("openAiGpt4.token");
+    private static final String GPT_3_TOKEN = configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty());
+    private static final String GPT_4_TOKEN = configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty());
 
     public ChatRequest(TelegramBotUser user, String message, GptModels model)
     {
@@ -61,9 +61,6 @@ public class ChatRequest
                 if (!isException)
                 {
                     //LogFiles.writeToRequestLog(user, message, model);
-                }
-                if (!isException)
-                {
                     ChatMessage msg = new ChatMessage(ChatMessageRole.USER.value(), message);
                     user.getMessageList().add(msg);
                 }
@@ -83,7 +80,7 @@ public class ChatRequest
                 if (model.equals(GptModels.GPT4))
                 {
                     user.setTokensBalance(user.getTokensBalance() - (countPromptTokens() + countCompletionTokens(choices.get(0).getMessage().getContent())));
-                  //  LogFiles.writeUsersToFile();
+                    DataSerializer.serializeUsersList();
                 }
                 user.getMessageList().add(choices.get(0).getMessage());
             }
