@@ -11,27 +11,12 @@ public class Main
 {
     public static void main(String[] args)
     {
-        setupBot();
+        setupBotFiles();
+        setupBotApi();
     }
 
-    private static void setupBot()
+    private static void setupBotApi()
     {
-        try
-        {
-            PropertiesManager.loadConfigProperties();
-        }
-        catch (NotValidConfigDataException e)
-        {
-            System.out.println(e.getMessage());
-            return;
-        }
-
-        PropertiesManager.loadMsgProperties();
-
-
-        DataSerializer.loadStorageFile();
-        DataSerializer.deserializeUsersList();
-
 
         TelegramBotsApi api = null;
         try
@@ -40,9 +25,28 @@ public class Main
             api.registerBot(new TelegramBot());
         }
         catch (TelegramApiException e)
+
         {
             throw new RuntimeException(e);
         }
 
+    }
+
+    private static void setupBotFiles()
+    {
+        try
+        {
+            PropertiesManager.loadConfigProperties();
+        }
+        catch (NotValidConfigDataException e)
+        {
+            System.out.println(e.getMessage());
+        }
+
+        PropertiesManager.loadMsgProperties();
+
+
+        DataSerializer.loadStorageFile();
+        DataSerializer.deserializeUsersList();
     }
 }

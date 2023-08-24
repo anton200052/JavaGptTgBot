@@ -28,7 +28,7 @@ public class ReplyMarkups
     private static final ReplyKeyboardMarkup REPLY_CHAT_MENU_RU;
     private static final ReplyKeyboardMarkup REPLY_MODEL_CHOOSE_EN;
     private static final ReplyKeyboardMarkup REPLY_CHAT_MENU_EN;
-    private static final ReplyKeyboardMarkup REPLY_CHOOSE_LANGUAGE;
+    private static final InlineKeyboardMarkup INLINE_CHOOSE_LANGUAGE;
 
 
     static
@@ -36,30 +36,29 @@ public class ReplyMarkups
         PREVIOUS = createOneRowReplyMarkup("previous");
         EMPTY = createOneRowReplyMarkup("nullMarkup");
 
-        INLINE_BUY_TOKENS_RU = createInlineMarkup(Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty()), CallbackData.PRESSED_BUY_BUTTON.getData())));
-        INLINE_BUY_TOKENS_EN = createInlineMarkup(Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty()), CallbackData.PRESSED_BUY_BUTTON.getData())));
-        INLINE_PRODUCT_LIST_RU = createInlineMarkup(Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData())));
-        INLINE_PRODUCT_LIST_EN = createInlineMarkup(Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), Arrays.asList(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData())));
+        INLINE_BUY_TOKENS_RU = createInlineMarkup(List.of(createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty()), CallbackData.PRESSED_BUY_BUTTON.getData()))));
+        INLINE_BUY_TOKENS_EN = createInlineMarkup(List.of(createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty()), CallbackData.PRESSED_BUY_BUTTON.getData()))));
+        INLINE_PRODUCT_LIST_RU = createInlineMarkup(List.of(createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))));
+        INLINE_PRODUCT_LIST_EN = createInlineMarkup(List.of(createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))));
+        INLINE_CHOOSE_LANGUAGE = createInlineMarkup(List.of(createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty()), CallbackData.PRESSED_RU_LANGUAGE_BUTTON.getData()), createInlineButton(enMsgProperties.getProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty()), CallbackData.PRESSED_EN_LANGUAGE_BUTTON.getData()))));
 
 
-        REPLY_CHOOSE_LANGUAGE = createOneRowReplyMarkup(LanguageCodes.RU.getLanguageTitle(), LanguageCodes.EN.getLanguageTitle());
         REPLY_MODEL_CHOOSE_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
         REPLY_CHAT_MENU_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty()));
         REPLY_MODEL_CHOOSE_EN = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
         REPLY_CHAT_MENU_EN = createOneRowReplyMarkup(enMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty()), enMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty()));
     }
 
-    private static InlineKeyboardMarkup createInlineMarkup(List<InlineKeyboardButton>... lines)
+    private static InlineKeyboardMarkup createInlineMarkup(List<List<InlineKeyboardButton>> rows)
     {
         InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
-        List<List<InlineKeyboardButton>> rows = new ArrayList<>();
-
-        for (List<InlineKeyboardButton> line : lines)
-        {
-            rows.add(line);
-        }
         inlineKeyboardMarkup.setKeyboard(rows);
         return inlineKeyboardMarkup;
+    }
+
+    private static List<InlineKeyboardButton> createInlineRow(InlineKeyboardButton... buttons)
+    {
+        return new ArrayList<>(Arrays.asList(buttons));
     }
 
     private static InlineKeyboardButton createInlineButton(String text, String callbackData)
@@ -143,8 +142,8 @@ public class ReplyMarkups
         }
     }
 
-    public static ReplyKeyboardMarkup getReplyChooseLanguage()
+    public static InlineKeyboardMarkup getInlineChooseLanguage()
     {
-        return REPLY_CHOOSE_LANGUAGE;
+        return INLINE_CHOOSE_LANGUAGE;
     }
 }

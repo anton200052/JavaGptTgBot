@@ -213,12 +213,12 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         LanguageCodes language = user.getLanguage();
         Long chatId = user.getChatId();
-        if (user.getCurrentStatus().equals(UserStatus.MAIN_MENU))
+        if (!user.getCurrentStatus().equals(UserStatus.CHOOSE_LANGUAGE))
         {
             if (cmd.equals("/start"))
             {
                 user.setCurrentStatus(UserStatus.CHOOSE_LANGUAGE);
-                sendMessage(chatId, ReplyMarkups.getReplyChooseLanguage(), PropertiesManager.getEnMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()) + " / " + PropertiesManager.getRuMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getInlineChooseLanguage(), PropertiesManager.getEnMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()) + " / " + PropertiesManager.getRuMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()));
             }
             else if (cmd.equals("/help"))
             {
@@ -352,25 +352,6 @@ public class TelegramBot extends TelegramLongPollingBot
             }
         }
 
-        else if (user.getCurrentStatus().equals(UserStatus.CHOOSE_LANGUAGE))
-        {
-            if (msg.equals(LanguageCodes.RU.getLanguageTitle()))
-            {
-                user.setLanguage(LanguageCodes.RU);
-                user.setMsgProperties(PropertiesManager.getRuMsgProperties());
-            }
-            else if (msg.equals(LanguageCodes.EN.getLanguageTitle()))
-            {
-                user.setLanguage(LanguageCodes.EN);
-                user.setMsgProperties(PropertiesManager.getEnMsgProperties());
-            }
-
-            DataSerializer.serializeUsersList();
-            sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_START_1.getProperty()));
-            sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_START_2.getProperty()));
-            user.setCurrentStatus(UserStatus.MAIN_MENU);
-        }
-
         else
         {
             sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty()));
@@ -408,6 +389,11 @@ public class TelegramBot extends TelegramLongPollingBot
         else if (data.equals(CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))
         {
             sendMessage(chatId, ReplyMarkups.getEMPTY(), String.format(user.getMsgProperties().getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 319));
+        }
+
+        else if (data.equals(CallbackData.PRESSED_RU_LANGUAGE_BUTTON.getData()))
+        {
+
         }
     }
 
@@ -453,6 +439,11 @@ public class TelegramBot extends TelegramLongPollingBot
         }
 
         return msg;
+    }
+
+    public static String getVersion()
+    {
+        return "";
     }
 
     private boolean isUserInListByUserName(String userName)

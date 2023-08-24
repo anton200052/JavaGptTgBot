@@ -1,8 +1,6 @@
 package me.vasylkov.bot;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -86,7 +84,8 @@ public class PropertiesManager
 
         if (!isConfigPropertiesDataValid())
         {
-            throw new NotValidConfigDataException("Откройте файл config.properties и замените слова empty соответствующими данными для каждого поля. Если вы повторно видите это сообщение тогда удалите файл и заполните его заново");
+            configProperties = initConfigProperties();
+            storeProperties(configPropertiesPath, configProperties);
         }
     }
 
@@ -98,6 +97,37 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty(), "empty");
+        return properties;
+    }
+
+    public static Properties initConfigProperties() throws NotValidConfigDataException
+    {
+        Properties properties = new Properties();
+
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in)))
+        {
+            System.out.println("Enter telegram bot username:\n");
+            properties.setProperty(PropertiesKeys.CONFIG_BOT_USERNAME.getProperty(), bufferedReader.readLine());
+
+            System.out.println("Enter telegram bot token:\n");
+            properties.setProperty(PropertiesKeys.CONFIG_BOT_TOKEN.getProperty(), bufferedReader.readLine());
+
+            System.out.println("Enter OpenAI GPT-3.5 token:\n");
+            properties.setProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty(), bufferedReader.readLine());
+
+            System.out.println("Enter OpenAI GPT-4 token(it can be same as GPT-3.5 token):\n");
+            properties.setProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty(), bufferedReader.readLine());
+
+            System.out.println("Enter admins telegram id`s. Format: id1,id2,id3,id4\n");
+            properties.setProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty(), bufferedReader.readLine());
+
+
+            System.out.println("If you want to change or add anything. For example, to change the username or token of the bot,\njust open the config.properties file through any text editor in the root directory of the jar file");
+        }
+        catch (IOException e)
+        {
+            throw new NotValidConfigDataException("Откройте файл config.properties и замените слова empty соответствующими данными для каждого поля. Если вы повторно видите это сообщение тогда удалите файл и заполните его заново");
+        }
         return properties;
     }
 
