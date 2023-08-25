@@ -57,7 +57,7 @@ public class ChatRequest
         {
             synchronized (user.getMessageList())
             {
-                int waitMsgId = instance.sendMessage(chatId, ReplyMarkups.getPREVIOUS(), user.getMsgProperties().getProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty()));
+                int waitMsgId = instance.sendMessage(chatId, ReplyMarkups.getPrevious(), user.getMsgProperties().getProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty()));
                 if (!isException)
                 {
                     //LogFiles.writeToRequestLog(user, message, model);
@@ -95,7 +95,7 @@ public class ChatRequest
             }
             else
             {
-                instance.sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
+                instance.sendMessage(chatId, ReplyMarkups.getEmpty(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
                 return;
             }
         }

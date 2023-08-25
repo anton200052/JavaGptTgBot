@@ -13,21 +13,25 @@ import java.util.Properties;
 
 public class TelegramBotUser extends User
 {
-    private Properties msgProperties;
+    private transient Properties msgProperties;
     private final Long chatId;
-    private LanguageCodes language;
+    private Boolean isPremium;
+    private Languages language;
     private Integer tokensBalance = 0;
+    private GptModels gptModel;
     private transient UserStatus currentStatus;
     private transient List<ChatMessage> messageList;
 
-    public TelegramBotUser(LanguageCodes language, Properties msgProperties, Long chatId, Long id, String firstName, Boolean isBot, String lastName, String userName, String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries, Boolean isPremium, Boolean addedToAttachmentMenu)
+    public TelegramBotUser(Long chatId, Long id, String firstName, Boolean isBot, String lastName, String userName, String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries, Boolean isPremium, Boolean addedToAttachmentMenu)
     {
         super(id, firstName, isBot, lastName, userName, languageCode, canJoinGroups, canReadAllGroupMessages, supportInlineQueries, isPremium, addedToAttachmentMenu);
         this.currentStatus = UserStatus.MAIN_MENU;
         this.messageList = new ArrayList<>();
+        gptModel = GptModels.GPT3;
         this.chatId = chatId;
-        this.language = language;
-        this.msgProperties = msgProperties;
+        this.language = Languages.EN;
+        this.msgProperties = PropertiesManager.getEnMsgProperties();
+        this.isPremium = false;
     }
 
     @Serial
@@ -35,6 +39,8 @@ public class TelegramBotUser extends User
     {
         in.defaultReadObject();
 
+        this.language = Languages.EN;
+        this.msgProperties = PropertiesManager.getEnMsgProperties();
         this.currentStatus = UserStatus.MAIN_MENU;
         this.messageList = new ArrayList<>();
     }
@@ -55,12 +61,12 @@ public class TelegramBotUser extends User
         return msgProperties;
     }
 
-    public LanguageCodes getLanguage()
+    public Languages getLanguage()
     {
         return language;
     }
 
-    public void setLanguage(LanguageCodes language)
+    public void setLanguage(Languages language)
     {
         this.language = language;
     }
@@ -90,6 +96,20 @@ public class TelegramBotUser extends User
         return currentStatus;
     }
 
+    public GptModels getGptModel()
+    {
+        return gptModel;
+    }
+
+    public void setGptModel(GptModels gptModel)
+    {
+        this.gptModel = gptModel;
+    }
+
+    public Boolean isPremium()
+    {
+        return isPremium;
+    }
     public List<ChatMessage> getMessageList()
     {
         return messageList;

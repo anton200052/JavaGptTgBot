@@ -27,9 +27,7 @@ public class TelegramBot extends TelegramLongPollingBot
 {
     private static List<TelegramBotUser> usersList = new ArrayList<>();
     private static final Properties configProperties = PropertiesManager.getConfigProperties();
-    private static final List<Long> adminsId = Arrays.stream(configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()).split(","))
-            .map(str -> Long.parseLong(str.trim()))
-            .toList();
+    private static final List<Long> adminsId = Arrays.stream(configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()).split(",")).map(str -> Long.parseLong(str.trim())).toList();
 
     public static List<TelegramBotUser> getUsersList()
     {
@@ -58,8 +56,6 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         if (update.hasMessage())
         {
-            Properties temp = PropertiesManager.getEnMsgProperties();
-            LanguageCodes tempCode = LanguageCodes.EN;
             Message message = update.getMessage();
             User tempUser = message.getFrom();
             Long chatId = message.getChatId();
@@ -68,12 +64,13 @@ public class TelegramBot extends TelegramLongPollingBot
 
             if ((user = getUserFromList(tempUser.getId())) == null)
             {
-                user = new TelegramBotUser(tempCode, temp, chatId, tempUser.getId(), tempUser.getFirstName(), tempUser.getIsBot(), tempUser.getLastName(), tempUser.getUserName(), tempUser.getLanguageCode(), tempUser.getCanJoinGroups(), tempUser.getCanReadAllGroupMessages(), tempUser.getSupportInlineQueries(), tempUser.getIsPremium(), tempUser.getAddedToAttachmentMenu());
+                user = new TelegramBotUser(chatId, tempUser.getId(), tempUser.getFirstName(), tempUser.getIsBot(), tempUser.getLastName(), tempUser.getUserName(), tempUser.getLanguageCode(), tempUser.getCanJoinGroups(), tempUser.getCanReadAllGroupMessages(), tempUser.getSupportInlineQueries(), tempUser.getIsPremium(), tempUser.getAddedToAttachmentMenu());
                 usersList.add(user);
                 DataSerializer.serializeUsersList();
             }
 
 
+            Properties msgProperties = user.getMsgProperties();
             if (update.getMessage().hasText() || update.getMessage().hasDocument())
             {
                 try
@@ -81,13 +78,13 @@ public class TelegramBot extends TelegramLongPollingBot
                     msg = getMsg(user, update);
                     if (msg == null)
                     {
-                        sendMessage(chatId, ReplyMarkups.getPREVIOUS(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty()));
+                        sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty()));
                         return;
                     }
                 }
                 catch (NotTxtFormatException e)
                 {
-                    sendMessage(chatId, ReplyMarkups.getPREVIOUS(), e.getMessage());
+                    sendMessage(chatId, ReplyMarkups.getPrevious(), e.getMessage());
                     return;
                 }
 
@@ -126,9 +123,9 @@ public class TelegramBot extends TelegramLongPollingBot
         sendMessage.enableMarkdown(true);
         try
         {
-            if (!markup.equals(ReplyMarkups.getPREVIOUS()))
+            if (!markup.equals(ReplyMarkups.getPrevious()))
             {
-                if (!markup.equals(ReplyMarkups.getEMPTY()))
+                if (!markup.equals(ReplyMarkups.getEmpty()))
                 {
                     sendMessage.setReplyMarkup(markup);
                 }
@@ -211,79 +208,61 @@ public class TelegramBot extends TelegramLongPollingBot
 
     private void handleCommands(TelegramBotUser user, String cmd)
     {
-        LanguageCodes language = user.getLanguage();
+        Properties msgProperties = user.getMsgProperties();
+        Languages language = user.getLanguage();
         Long chatId = user.getChatId();
-        if (!user.getCurrentStatus().equals(UserStatus.CHOOSE_LANGUAGE))
+        if (!user.getCurrentStatus().equals(UserStatus.CHAT_WITH_GPT))
         {
             if (cmd.equals("/start"))
             {
-                user.setCurrentStatus(UserStatus.CHOOSE_LANGUAGE);
-                sendMessage(chatId, ReplyMarkups.getInlineChooseLanguage(), PropertiesManager.getEnMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()) + " / " + PropertiesManager.getRuMsgProperties().getProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getInlineChooseLanguage(language), PropertiesManager.getEnMsgProperties().getProperty(PropertiesKeys.SETTINGS_CHOOSE_LANGUAGE.getProperty()) + " / " + PropertiesManager.getRuMsgProperties().getProperty(PropertiesKeys.SETTINGS_CHOOSE_LANGUAGE.getProperty()));
+            }
+            else if (cmd.equals("/menu"))
+            {
+                sendMessage(chatId, ReplyMarkups.getInlineMainMenu(language), msgProperties.getProperty(PropertiesKeys.MENU_TITLE.getProperty()));
             }
             else if (cmd.equals("/help"))
             {
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_HELP_1.getProperty()));
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_HELP_2.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.MENU_HELP.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.MENU_HELP.getProperty()));
             }
             else if (cmd.equals("/startchat"))
             {
-                sendMessage(chatId, ReplyMarkups.getReplyModelChoose(language), user.getMsgProperties().getProperty(PropertiesKeys.MENU_MODEL_CHOOSE.getProperty()));
-                user.setCurrentStatus(UserStatus.CHOOSE_MODEL);
+                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), msgProperties.getProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty()));
+                user.setCurrentStatus(UserStatus.CHAT_WITH_GPT);
             }
             else if (cmd.equals("/balance"))
             {
-                sendMessage(chatId, ReplyMarkups.getInlineBuyTokens(language), String.format(user.getMsgProperties().getProperty(PropertiesKeys.MENU_BALANCE.getProperty()), user.getTokensBalance()));
+               // sendMessage(chatId, ReplyMarkups.getInlineBuyTokens(language), String.format(msgProperties.getProperty(PropertiesKeys.MENU_BALANCE.getProperty()), user.getTokensBalance()));
             }
 
             if (adminsId.contains(user.getId()))
             {
                 if (cmd.equals("/addtokens"))
                 {
-                    sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ADMIN_PRINT_USER_DATA.getProperty()));
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ADMIN_PRINT_USER_DATA.getProperty()));
                     user.setCurrentStatus(UserStatus.ADMIN_ADD_TOKENS);
                 }
                 else if (cmd.equals("/sendmessage"))
                 {
-                    sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ADMIN_SEND_MESSAGE_TO_ALL.getProperty()));
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ADMIN_SEND_MESSAGE_TO_ALL.getProperty()));
                     user.setCurrentStatus(UserStatus.ADMIN_SEND_MESSAGE);
                 }
             }
         }
         else
         {
-            sendMessage(chatId, ReplyMarkups.getPREVIOUS(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty()));
+            sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty()));
         }
     }
 
     private void handleMessages(TelegramBotUser user, String msg)
     {
-        LanguageCodes language = user.getLanguage();
+        Properties msgProperties = user.getMsgProperties();
+        Languages language = user.getLanguage();
         Long chatId = user.getChatId();
-        if (user.getCurrentStatus().equals(UserStatus.CHOOSE_MODEL))
-        {
-            if (msg.equals(user.getMsgProperties().getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty())))
-            {
-                user.setCurrentStatus(UserStatus.GPT_3_CHAT);
-                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), user.getMsgProperties().getProperty(PropertiesKeys.MENU_STARTED_GPT3_CHAT.getProperty()));
-            }
-            else if (msg.equals(user.getMsgProperties().getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty())))
-            {
-                if (user.getTokensBalance() < 300)
-                {
-                    sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_NOT_ENOUGH_TOKENS.getProperty()));
-                    user.setCurrentStatus(UserStatus.MAIN_MENU);
-                    return;
-                }
-                user.setCurrentStatus(UserStatus.GPT_4_CHAT);
-                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), user.getMsgProperties().getProperty(PropertiesKeys.MENU_STARTED_GPT4_CHAT.getProperty()));
-            }
-            else
-            {
-                sendMessage(chatId, ReplyMarkups.getPREVIOUS(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_INCORRECT_MODEL.getProperty()));
-            }
-        }
 
-        else if (user.getCurrentStatus().equals(UserStatus.ADMIN_ADD_TOKENS))
+        if (user.getCurrentStatus().equals(UserStatus.ADMIN_ADD_TOKENS))
         {
             try
             {
@@ -299,19 +278,19 @@ public class TelegramBot extends TelegramLongPollingBot
 
                 if ((u = getUserFromList(id)) == null)
                 {
-                    sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ADMIN_USER_NOT_FOUND.getProperty()));
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ADMIN_USER_NOT_FOUND.getProperty()));
                     return;
                 }
 
                 u.setTokensBalance(u.getTokensBalance() + tokensToAdd);
 
                 DataSerializer.serializeUsersList();
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ADMIN_TOKENS_ADDED.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ADMIN_TOKENS_ADDED.getProperty()));
                 user.setCurrentStatus(UserStatus.MAIN_MENU);
             }
             catch (NumberFormatException e)
             {
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty()));
                 user.setCurrentStatus(UserStatus.MAIN_MENU);
             }
         }
@@ -321,79 +300,152 @@ public class TelegramBot extends TelegramLongPollingBot
             sendMessageToAllUsers(msg);
         }
 
-        else if (user.getCurrentStatus().equals(UserStatus.GPT_3_CHAT) || user.getCurrentStatus().equals(UserStatus.GPT_4_CHAT))
+        else if (user.getCurrentStatus().equals(UserStatus.CHAT_WITH_GPT))
         {
-            if (msg.equals(user.getMsgProperties().getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty())))
+            if (msg.equals(msgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty())))
             {
                 user.getMessageList().clear();
                 user.setCurrentStatus(UserStatus.MAIN_MENU);
-                sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty()));
                 return;
             }
 
-            else if (msg.equals(user.getMsgProperties().getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty())))
+            else if (msg.equals(msgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty())))
             {
                 user.getMessageList().clear();
-                user.setCurrentStatus(UserStatus.CHOOSE_MODEL);
-                sendMessage(chatId, ReplyMarkups.getReplyModelChoose(language), user.getMsgProperties().getProperty(PropertiesKeys.MENU_MODEL_CHOOSE.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty()));
                 return;
             }
 
-            ChatRequest chatRequest;
-            if (user.getCurrentStatus().equals(UserStatus.GPT_3_CHAT))
-            {
-                chatRequest = new ChatRequest(user, msg, GptModels.GPT3);
-                chatRequest.sendNewChatRequest(this, ChatRequest.GPT3_MAX_TOKENS);
-            }
-            else if (user.getCurrentStatus().equals(UserStatus.GPT_4_CHAT))
-            {
-                chatRequest = new ChatRequest(user, msg, GptModels.GPT4);
-                chatRequest.sendNewChatRequest(this, ChatRequest.GPT4_MAX_TOKENS);
-            }
+            ChatRequest chatRequest = new ChatRequest(user, msg, user.getGptModel().equals(GptModels.GPT3) ? GptModels.GPT3 : GptModels.GPT4);
+            chatRequest.sendNewChatRequest(this, user.getGptModel().equals(GptModels.GPT3) ? ChatRequest.GPT3_MAX_TOKENS : ChatRequest.GPT4_MAX_TOKENS);
         }
 
         else
         {
-            sendMessage(chatId, ReplyMarkups.getEMPTY(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty()));
+            sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty()));
         }
     }
 
     private void handlePhotos(TelegramBotUser user, Message message)
     {
+        Properties msgProperties = user.getMsgProperties();
         for (Long id : adminsId)
         {
-            sendMessage(id, ReplyMarkups.getPREVIOUS(), String.format(user.getMsgProperties().getProperty(PropertiesKeys.ADMIN_USER_SEND_PHOTO.getProperty()), user.getUserName()));
+            sendMessage(id, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.ADMIN_USER_SEND_PHOTO.getProperty()), user.getUserName()));
             sendPhoto(id, new InputFile(message.getPhoto().get(0).getFileId()));
         }
     }
 
     private void handleCallbackData(TelegramBotUser user, String data, Long chatId, Integer messageId)
     {
-        LanguageCodes language = user.getLanguage();
-        if (data.equals(CallbackData.PRESSED_BUY_BUTTON.getData()))
+        Languages language = user.getLanguage();
+        Properties msgProperties = user.getMsgProperties();
+
+        if (!user.getCurrentStatus().equals(UserStatus.CHAT_WITH_GPT))
         {
-            editMessageText(chatId, messageId, user.getMsgProperties().getProperty(PropertiesKeys.MENU_PRODUCT_LIST.getProperty()));
-            editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineProductList(language));
+            if (data.equals(CallbackData.PRESSED_MENU_BALANCE_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, String.format(msgProperties.getProperty(user.isPremium() ? PropertiesKeys.MENU_PREMIUM_BALANCE.getProperty() : PropertiesKeys.MENU_DEFAULT_BALANCE.getProperty()), user.getTokensBalance()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineBuyTokens(language));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_MENU_SETTINGS_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_SETTINGS_AI_MODEL_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_AI_MODELS.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineAIModels(language));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_SETTINGS_LANGUAGE_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_CHOOSE_LANGUAGE.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineChooseLanguage(language));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_SETTINGS_GPT3_BUTTON.getData()))
+            {
+                user.setGptModel(GptModels.GPT3);
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
+                sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.SETTINGS_MODEL_CHANGED.getProperty()), msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty())));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_SETTINGS_GPT4_BUTTON.getData()))
+            {
+                if (user.isPremium())
+                {
+                    user.setGptModel(GptModels.GPT4);
+                    editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
+                    editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.SETTINGS_MODEL_CHANGED.getProperty()), msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
+                }
+                else
+                {
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty()));
+                }
+            }
+
+            else if (data.equals(CallbackData.PRESSED_MENU_HELP_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.MENU_HELP.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineHelp(language));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_MENU_BUY_TOKENS_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.MENU_PRODUCT_LIST.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineProductList(language));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_PURCHASE_MINIMAL_BUTTON.getData()))
+            {
+                sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 119));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_PURCHASE_MEDIUM_BUTTON.getData()))
+            {
+                sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 199));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_PURCHASE_MAXIMUM_BUTTON.getData()))
+            {
+                sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 319));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_SETTINGS_RU_LANGUAGE_BUTTON.getData()))
+            {
+                user.setLanguage(language = Languages.RU);
+                user.setMsgProperties(msgProperties = PropertiesManager.getRuMsgProperties());
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
+                sendMessage(chatId, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.SETTINGS_LANGUAGE_CHANGED.getProperty()), PropertiesManager.getRuMsgProperties().getProperty(PropertiesKeys.SETTINGS_LANGUAGE_TITLE.getProperty())));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_SETTINGS_EN_LANGUAGE_BUTTON.getData()))
+            {
+                user.setLanguage(language = Languages.EN);
+                user.setMsgProperties(msgProperties = PropertiesManager.getEnMsgProperties());
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
+                sendMessage(chatId, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.SETTINGS_LANGUAGE_CHANGED.getProperty()), PropertiesManager.getEnMsgProperties().getProperty(PropertiesKeys.SETTINGS_LANGUAGE_TITLE.getProperty())));
+            }
+
+            else if (data.equals(CallbackData.PRESSED_MENU_RETURN_BUTTON.getData()))
+            {
+                editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.MENU_TITLE.getProperty()));
+                editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineMainMenu(language));
+            }
         }
-
-        else if (data.equals(CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData()))
+        else
         {
-            sendMessage(chatId, ReplyMarkups.getEMPTY(), String.format(user.getMsgProperties().getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 119));
-        }
-
-        else if (data.equals(CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData()))
-        {
-            sendMessage(chatId, ReplyMarkups.getEMPTY(), String.format(user.getMsgProperties().getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 199));
-        }
-
-        else if (data.equals(CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))
-        {
-            sendMessage(chatId, ReplyMarkups.getEMPTY(), String.format(user.getMsgProperties().getProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty()), 319));
-        }
-
-        else if (data.equals(CallbackData.PRESSED_RU_LANGUAGE_BUTTON.getData()))
-        {
-
+            editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty()));
+            editMessageInlineKeyboard(chatId, messageId, null);
         }
     }
 
@@ -401,7 +453,7 @@ public class TelegramBot extends TelegramLongPollingBot
     {
         for (TelegramBotUser user : usersList)
         {
-            sendMessage(user.getChatId(), ReplyMarkups.getPREVIOUS(), msg);
+            sendMessage(user.getChatId(), ReplyMarkups.getPrevious(), msg);
         }
     }
 
@@ -412,6 +464,7 @@ public class TelegramBot extends TelegramLongPollingBot
 
     private String getMsgFromTxtFile(TelegramBotUser user, Document document) throws NotTxtFormatException
     {
+        Properties msgProperties = user.getMsgProperties();
         GetFile getFile = new GetFile();
         getFile.setFileId(document.getFileId());
         String msg = "";
@@ -421,7 +474,7 @@ public class TelegramBot extends TelegramLongPollingBot
             File file = execute(getFile);
             if (!file.getFilePath().endsWith(".txt"))
             {
-                throw new NotTxtFormatException(user.getMsgProperties().getProperty(PropertiesKeys.ERROR_NOT_A_TXT_FILE.getProperty()));
+                throw new NotTxtFormatException(msgProperties.getProperty(PropertiesKeys.ERROR_NOT_A_TXT_FILE.getProperty()));
             }
 
             try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new URL("https://api.telegram.org/file/bot" + getBotToken() + "/" + file.getFilePath()).openStream())))

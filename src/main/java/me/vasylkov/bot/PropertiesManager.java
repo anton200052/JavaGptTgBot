@@ -137,11 +137,17 @@ public class PropertiesManager
 
         // Errors
         properties.setProperty(PropertiesKeys.ERROR_NOT_A_TXT_FILE.getProperty(), "Ошибка! Файл должен быть формата .txt");
-        properties.setProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty(), "Вы должны завершить чат чтобы использовать данную команду.");
+        properties.setProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty(), "Вы должны завершить чат с GPT чтобы совершить это действие");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_MODEL.getProperty(), "Выбрана неправильная модель, пожалуйста выберите одну из моделей предложенных в навигационном меню");
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty(), "Чтобы задать вопрос боту используйте команду: /startchat");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty(), "Ошибка! Неправильный формат ввода. Вы можете либо написать сообщение боту, либо отправить ему txt файл и он прочитает из него.");
         properties.setProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty(), "Ошибка при парсинге");
+        properties.setProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty(), """
+                ❌ GPT-4 - это модель премиум-класса!
+                
+                ⚪ Для её использования вам необходим статус Premium
+                ⤷ /menu -> Баланс токенов
+                """);
         properties.setProperty(PropertiesKeys.ERROR_NOT_ENOUGH_TOKENS.getProperty(), """
                 На вашем балансе должно быть больше чем 300 токенов для того чтобы использовать GPT-4 🙁
                 Пожалуйста выберите другую модель либо пополните свой баланс.
@@ -161,13 +167,14 @@ public class PropertiesManager
                 """);
 
         // menu
-        properties.setProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty(), "Выберите язык интерфейса");
-        properties.setProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty(), "RU");
-        properties.setProperty("menu.modelChoose", "Выберите модель чата в навигационном меню.\nGPT-3.5: Бесплатно");
-        properties.setProperty("menu.startedGpt3Chat", "Вы успешно начали чат с моделью GPT-3.5.");
-        properties.setProperty("menu.startedGpt4Chat", "Вы успешно начали чат с моделью GPT-4. Генерация ответа занимает до 2 минут.");
-        properties.setProperty("menu.returnedToMainMenu", "Вы вернулись в главное меню.");
-        properties.setProperty("menu.productList", """
+        properties.setProperty(PropertiesKeys.MENU_RETURN_TO_MENU_BUTTON_TITLE.getProperty(), "Назад в меню↩️");
+        properties.setProperty(PropertiesKeys.MENU_HELP_BUTTON_TITLE.getProperty(), "\uD83D\uDCA1 Помощь");
+        properties.setProperty(PropertiesKeys.MENU_BALANCE_BUTTON_TITLE.getProperty(), "\uD83C\uDF49 Баланс токенов");
+        properties.setProperty(PropertiesKeys.MENU_SETTINGS_BUTTON_TITLE.getProperty(), "⚙️ Настройки");
+        properties.setProperty(PropertiesKeys.MENU_TITLE.getProperty(), "\uD83C\uDFE0 Меню:");
+        properties.setProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty(), "Вы успешно начали чат с моделью GPT");
+        properties.setProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty(), "Вы вернулись в главное меню.");
+        properties.setProperty(PropertiesKeys.MENU_PRODUCT_LIST.getProperty(), """
                 💌 Сколько токенов вы хотите приобрести?
 
                 ⚡ Подсказка:
@@ -175,16 +182,44 @@ public class PropertiesManager
 
                 ‼️ Оплата только через украинские карты, для оплаты в другой валюте обратитесь в нашу поддержку - /help ‼️
                 """);
-        properties.setProperty("menu.balance", """
+        properties.setProperty(PropertiesKeys.MENU_PREMIUM_BALANCE.getProperty(), """
                 GPT-4:
-                ⚪ У вас %d💰токенов на балансе
-
-                GPT-3.5:
-                ⚪ Неограниченное использование 🌟
-
+                🔴Премиум статус:
+                ⤷ ✅Активирован
+                
+                🟤Баланс
+                ⤷ У вас %d💰 GPT-4 токенов
+                
+                🍉Премиум статус вам даёт
+                ⤷ Доступ к GPT-4
+                ⤷ Ввод с помощью голосовых сообщений
+                ⤷ Ввод с помощью текстовых файлов
+                
+               
                 Покупка токенов:
                 """);
-        properties.setProperty("menu.start1", """
+
+        properties.setProperty(PropertiesKeys.MENU_DEFAULT_BALANCE.getProperty(), """
+                GPT-4:
+                🔴Премиум статус:
+                ⤷ ❌Дективирован
+                
+                🟤Баланс
+                ⤷ У вас %d💰 GPT-4 токенов
+                
+                💡 Примечание: Премиум статус можно получить посредством покупки
+                любого количества токенов (нажмите кнопку снизу)
+                
+                🍉Премиум статус вам даёт
+                ⤷ Доступ к GPT-4
+                ⤷ Ввод с помощью голосовых сообщений
+                ⤷ Ввод с помощью текстовых файлов
+                
+               
+                Покупка токенов:
+                """);
+
+        properties.setProperty(PropertiesKeys.MENU_START_1.getProperty(), """
                 Привет! 😄 Я самый передовой искусственный интеллект в мире (созданный OpenAI)! 🌟
                                
                 Я рад помочь вам с любой задачей, будь то 💻 программирование, отладка или объяснение кода! 💡 Я могу сочинять электронные письма, 📧 писать блоговые статьи на любую тему, или даже помогать с домашними заданиями! 📚
@@ -193,7 +228,7 @@ public class PropertiesManager
                                
                 А если вы просто хотите поболтать, я всегда готов вести интересные и приятные разговоры! 🗣️ Что бы вы ни хотели, я здесь, чтобы это исполнить! 🌟
                 """);
-        properties.setProperty("menu.start2", """
+        properties.setProperty(PropertiesKeys.MENU_START_2.getProperty(), """
                 Прежде чем мы начнем, есть 2 важные вещи, которые стоит знать: ✌️
                                 
                 1. Вы можете общаться со мной на любом языке. Но я наиболее эффективно работаю на 🇬🇧 английском языке! 💬💪
@@ -202,11 +237,12 @@ public class PropertiesManager
                                 
                 👩🏼‍💻 Поддержка: @lavviku 🌟
                 """);
-        properties.setProperty("menu.help1", """
+
+        properties.setProperty(PropertiesKeys.MENU_HELP.getProperty(), """
                 💬 Свяжитесь с нами здесь по всем важным вопросам 💬
                 💻 Поддержка: (имя_пользователя) 🌟
-                """);
-        properties.setProperty("menu.help2", """
+                
+                
                 Краткое руководство по использованию бота:
                                 
                 • Список команд расположен на левой стороне поля ввода сообщения. Чтобы ввести команду, просто нажмите на интересующую вас команду.
@@ -228,19 +264,60 @@ public class PropertiesManager
                 """);
 
 
+        // settings
+        properties.setProperty(PropertiesKeys.SETTINGS_CHOOSE_LANGUAGE.getProperty(), "Выберите язык: ");
+        properties.setProperty(PropertiesKeys.SETTINGS_LANGUAGE_CHANGED.getProperty(), "Язык изменён на %s");
+        properties.setProperty(PropertiesKeys.SETTINGS_MODEL_CHANGED.getProperty(), "Модель изменена на %s");
+        properties.setProperty(PropertiesKeys.SETTINGS_LANGUAGE_TITLE.getProperty(), "RU");
+        properties.setProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty(), "🌟GPT-3.5🌟");
+        properties.setProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty(), "⚡GPT-4⚡");
+        properties.setProperty(PropertiesKeys.SETTINGS_TITLE.getProperty(), "⚙️ Настройки");
+        properties.setProperty(PropertiesKeys.SETTINGS_AI_MODEL_BUTTON_TITLE.getProperty(), "\uD83E\uDDE0 Модель GPT");
+        properties.setProperty(PropertiesKeys.SETTINGS_LANGUAGE_BUTTON_TITLE.getProperty(), "\uD83C\uDF10️ Язык");
+        properties.setProperty(PropertiesKeys.SETTINGS_AI_MODELS.getProperty(), """
+                GPT-3.5 - это хорошо известная модель, которая в 5 раз лучше, чем модель, используемая на бесплатном веб-сайте ChatGPT. Она быстрая и бесплатная. Идеально подходит для повседневных задач. Если есть задачи, с которыми она не справляется, попробуйте GPT-4.
+                                
+                💡 Примечание: GPT-3.5 - это бесплатная модель, в отличие от GPT-4, за который вам потребуются токены с вашего баланса.
+                                
+                🟣 Модель ChatGPT по умолчанию:
+                ⤷
+                🟢⚪⚪⚪⚪️ - Умная
+                                
+                🟢🟢⚪⚪⚪️ - Быстрая
+                                
+                🟢🟢🟢🟢🟢 - Дешевая
+                                
+                🟣 GPT-3.5:
+                ⤷
+                🟢🟢🟢⚪⚪️ - Умная
+                                
+                🟢🟢🟢⚪⚪ - Быстрая
+                                
+                🟢🟢🟢🟢🟢 - Дешевая
+                                
+                🟣 GPT-4:
+                ⤷
+                🟢🟢🟢🟢🟢 - Умная
+                                
+                🟢🟢🟢🟢🟢 - Быстрая
+                                
+                🟢🟢⚪️⚪️⚪️ - Дешевая
+                                
+                Выберите модель:
+                """);
+
+
         // Chat
         properties.setProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty(), "\uD83E\uDDE0ChatGPT генерирует ответ...");
-        properties.setProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty(), "🌟GPT-3.5🌟");
-        properties.setProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty(), "⚡GPT-4⚡");
-        properties.setProperty(PropertiesKeys.CHAT_END_CHAT.getProperty(), "Завершить чат \uD83D\uDCA7");
-        properties.setProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty(), "Начать новый чат \uD83D\uDD25");
+        properties.setProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty(), "Завершить чат \uD83D\uDCA7");
+        properties.setProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty(), "Начать новый чат \uD83D\uDD25");
 
 
         // Purchase
-        properties.setProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty(), "\uD83D\uDFE3+25К токенов - 119 UAH (-40%)");
-        properties.setProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty(), "\uD83D\uDFE3+50К токенов - 199 UAH (-50%)");
-        properties.setProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty(), "\uD83D\uDFE3+100К токенов - 319 UAH (-80%)");
-        properties.setProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty(), "\uD83E\uDD51Купить токены");
+        properties.setProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+25К токенов - 119 UAH (-40%)");
+        properties.setProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+50К токенов - 199 UAH (-50%)");
+        properties.setProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+100К токенов - 319 UAH (-80%)");
+        properties.setProperty(PropertiesKeys.PURCHASE_BUY_TOKENS_BUTTON_TITLE.getProperty(), "\uD83E\uDD51Купить токены");
         properties.setProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty(), """
                 ⚪ Отправьте %d UAH на данную карту:
                 ‼️MonoBank‼️→ (CARD NUMBER)
@@ -266,11 +343,17 @@ public class PropertiesManager
 
         // Errors
         properties.setProperty(PropertiesKeys.ERROR_NOT_A_TXT_FILE.getProperty(), "Error! The file must be in .txt format.");
-        properties.setProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty(), "You must exit the chat to use this command.");
+        properties.setProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty(), "You must end the chat with GPT in order to perform this action.");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_MODEL.getProperty(), "Incorrect model selected. Please choose one of the models provided in the navigation menu.");
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty(), "To ask a question to the bot, use the command: /startchat");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty(), "Error! Incorrect input format. You can either send a message to the bot or send a txt file for it to read.");
         properties.setProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty(), "Parsing error");
+        properties.setProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty(), """
+                ❌ GPT-4 is a Premium model!
+                
+                ⚪ To use it, you need to have Premium status
+                ⤷ /menu -> Tokens balance
+                """);
         properties.setProperty(PropertiesKeys.ERROR_NOT_ENOUGH_TOKENS.getProperty(), """
                 You need to have more than 300 tokens on your balance to use GPT-4 🙁
                 Please choose another model or top up your balance.
@@ -289,13 +372,14 @@ public class PropertiesManager
                 """);
 
         //menu
-        properties.setProperty(PropertiesKeys.MENU_CHOOSE_LANGUAGE.getProperty(), "Choose interface language");
-        properties.setProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty(), "EN");
-        properties.setProperty("menu.modelChoose", "Choose a chat model in the navigation menu.\nGPT-3.5: Free");
-        properties.setProperty("menu.startedGpt3Chat", "You have successfully started a chat with the GPT-3.5 model.");
-        properties.setProperty("menu.startedGpt4Chat", "You have successfully started a chat with the GPT-4 model. Response generation takes up to 2 minutes");
-        properties.setProperty("menu.returnedToMainMenu", "You have been returned to the main menu.");
-        properties.setProperty("menu.productList", """
+        properties.setProperty(PropertiesKeys.MENU_RETURN_TO_MENU_BUTTON_TITLE.getProperty(), "Back to menu↩️");
+        properties.setProperty(PropertiesKeys.MENU_HELP_BUTTON_TITLE.getProperty(), "\uD83D\uDCA1 Help");
+        properties.setProperty(PropertiesKeys.MENU_SETTINGS_BUTTON_TITLE.getProperty(), "⚙️ Settings");
+        properties.setProperty(PropertiesKeys.MENU_BALANCE_BUTTON_TITLE.getProperty(), "\uD83C\uDF49 Tokens balance");
+        properties.setProperty(PropertiesKeys.MENU_TITLE.getProperty(), "\uD83C\uDFE0 Menu:");
+        properties.setProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty(), "You have successfully started a chat with the GPT model.");
+        properties.setProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty(), "You have been returned to the main menu.");
+        properties.setProperty(PropertiesKeys.MENU_PRODUCT_LIST.getProperty(), """
                 💌 How many tokens would you like to purchase?
                     
                 ⚡ Hint:
@@ -303,16 +387,43 @@ public class PropertiesManager
                     
                 ‼️ Payment only via Ukrainian cards, for payment in other currency contact our support - /help ‼️
                 """);
-        properties.setProperty("menu.balance", """
+        properties.setProperty(PropertiesKeys.MENU_PREMIUM_BALANCE.getProperty(), """
                 GPT-4:
-                ⚪ You have %d💰tokens on your balance
-                    
-                GPT-3.5:
-                ⚪ Unlimited usage 🌟
-                    
-                Token purchase:
+                🔴Premium Status:
+                ⤷ ✅Activated
+                
+                🟤Balance
+                ⤷ You have %d💰 GPT-4 tokens
+                
+                🍉Premium Status grants you
+                ⤷ Access to GPT-4
+                ⤷ Input using voice messages
+                ⤷ Input using text files
+                
+               
+                Token Purchase:
                 """);
-        properties.setProperty("menu.start1", """
+
+        properties.setProperty(PropertiesKeys.MENU_DEFAULT_BALANCE.getProperty(), """
+                GPT-4:
+                🔴Premium Status:
+                ⤷ ❌Deactivated
+                
+                🟤Balance
+                ⤷ You have %d💰 GPT-4 tokens
+                
+                💡 Note: Premium Status can be obtained by purchasing
+                any amount of tokens (press the button below)
+                
+                🍉Premium Status grants you
+                ⤷ Access to GPT-4
+                ⤷ Input using voice messages
+                ⤷ Input using text files
+                
+               
+                Token Purchase:
+                """);
+        properties.setProperty(PropertiesKeys.MENU_START_1.getProperty(), """
                 Hello! 😄 I'm the most advanced Artificial Intelligence in the world (created by OpenAI)! 🌟
                        
                 I'm happy to assist you with any task, whether it's 💻 coding, debugging, or explaining code! 💡 I can compose emails, 📧 write blog posts on any topic, or even help with homework! 📚
@@ -321,7 +432,7 @@ public class PropertiesManager
                        
                 And if you just want to chat, I'm always available for interesting and pleasant conversations! 🗣️ Whatever you wish for, I'm here to fulfill it! 🌟
                 """);
-        properties.setProperty("menu.start2", """
+        properties.setProperty(PropertiesKeys.MENU_START_2.getProperty(), """
                 Before we begin, there are 2 important things to know: ✌️
                         
                 1. You can communicate with me in any language. But I work most effectively in 🇬🇧 English! 💬💪
@@ -330,11 +441,11 @@ public class PropertiesManager
                         
                 👩🏼‍💻 Support: @lavviku 🌟
                 """);
-        properties.setProperty("menu.help1", """
-                💬 Contact us here for all important questions 💬
+        properties.setProperty(PropertiesKeys.MENU_HELP.getProperty(), """
+                Contact us here for all important questions 💬
                 💻 Support: (username) 🌟
-                """);
-        properties.setProperty("menu.help2", """
+                
+                
                 Quick guide to using the bot:
                         
                 • The list of commands is located on the left side of the message input field. To enter a command, simply click on the command you are interested in.
@@ -355,19 +466,62 @@ public class PropertiesManager
                 • The longer the dialogue, the more tokens are used at once. So be economical and start a new chat after each question if you're not planning to have a dialogue with the bot.
                 """);
 
+
+        // settings
+        properties.setProperty(PropertiesKeys.SETTINGS_CHOOSE_LANGUAGE.getProperty(), "Select language: ");
+        properties.setProperty(PropertiesKeys.SETTINGS_LANGUAGE_CHANGED.getProperty(), "Language changed to %s");
+        properties.setProperty(PropertiesKeys.SETTINGS_MODEL_CHANGED.getProperty(), "Model changed to %s");
+        properties.setProperty(PropertiesKeys.SETTINGS_LANGUAGE_TITLE.getProperty(), "EN");
+        properties.setProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty(), "🌟GPT-3.5🌟");
+        properties.setProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty(), "⚡GPT-4⚡");
+        properties.setProperty(PropertiesKeys.SETTINGS_TITLE.getProperty(), "⚙️ Settings");
+        properties.setProperty(PropertiesKeys.SETTINGS_AI_MODEL_BUTTON_TITLE.getProperty(), "\uD83E\uDDE0 GPT Model");
+        properties.setProperty(PropertiesKeys.SETTINGS_LANGUAGE_BUTTON_TITLE.getProperty(), "\uD83C\uDF10️ Language");
+        properties.setProperty(PropertiesKeys.SETTINGS_AI_MODELS.getProperty(), """
+                GPT-3.5 is that well-known model, 5 times better than the model used on the free ChatGPT website. It's fast and free. Ideal for everyday tasks. If there are some tasks it can't handle, try the GPT-4
+                                
+                💡 Note: GPT-3.5 is a free model, unlike GPT-4, for which you'll need to pay tokens from your balance.
+                    
+                🟣Default ChatGPT:
+                 ⤷
+                🟢⚪⚪⚪⚪️ – Smart
+                                
+                🟢🟢⚪⚪⚪️ – Fast
+                                
+                🟢🟢🟢🟢🟢 – Cheap
+                
+                         
+                🟣GPT-3.5:
+                 ⤷
+                🟢🟢🟢⚪⚪️ – Smart
+                                
+                🟢🟢🟢⚪⚪ – Fast
+                                
+                🟢🟢🟢🟢🟢 – Cheap
+                
+           
+                🟣GPT-4:
+                 ⤷
+                🟢🟢🟢🟢🟢 – Smart
+                                
+                🟢🟢🟢🟢🟢 – Fast
+                                
+                🟢🟢⚪️⚪️⚪️ – Cheap
+                                
+                Select model:
+                """);
+
         // Chat
         properties.setProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty(), "\uD83E\uDDE0ChatGPT is generating a response...");
-        properties.setProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty(), "🌟GPT-3.5🌟");
-        properties.setProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty(), "⚡GPT-4⚡");
-        properties.setProperty(PropertiesKeys.CHAT_END_CHAT.getProperty(), "End chat \uD83D\uDCA7");
-        properties.setProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty(), "Start new chat \uD83D\uDD25");
+        properties.setProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty(), "End chat \uD83D\uDCA7");
+        properties.setProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty(), "Start new chat \uD83D\uDD25");
 
 
         // Purchase
-        properties.setProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty(), "\uD83D\uDFE3+25K tokens - 119 UAH (-40%)");
-        properties.setProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty(), "\uD83D\uDFE3+50K tokens - 199 UAH (-50%)");
-        properties.setProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty(), "\uD83D\uDFE3+100K tokens - 319 UAH (-80%)");
-        properties.setProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty(), "\uD83E\uDD51Buy Tokens");
+        properties.setProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+25K tokens - 119 UAH (-40%)");
+        properties.setProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+50K tokens - 199 UAH (-50%)");
+        properties.setProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+100K tokens - 319 UAH (-80%)");
+        properties.setProperty(PropertiesKeys.PURCHASE_BUY_TOKENS_BUTTON_TITLE.getProperty(), "\uD83E\uDD51Buy Tokens");
         properties.setProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty(), """
                 ⚪ Send %d UAH to this card:
                 ‼️MonoBank‼️→ (CARD NUMBER)

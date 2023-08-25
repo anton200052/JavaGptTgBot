@@ -15,39 +15,6 @@ public class ReplyMarkups
     private static final Properties ruMsgProperties = PropertiesManager.getRuMsgProperties();
     private static final Properties enMsgProperties = PropertiesManager.getEnMsgProperties();
 
-    private static final ReplyKeyboardMarkup PREVIOUS;
-    private static final ReplyKeyboardMarkup EMPTY;
-
-    private static final InlineKeyboardMarkup INLINE_BUY_TOKENS_RU;
-    private static final InlineKeyboardMarkup INLINE_PRODUCT_LIST_RU;
-    private static final InlineKeyboardMarkup INLINE_BUY_TOKENS_EN;
-    private static final InlineKeyboardMarkup INLINE_PRODUCT_LIST_EN;
-
-
-    private static final ReplyKeyboardMarkup REPLY_MODEL_CHOOSE_RU;
-    private static final ReplyKeyboardMarkup REPLY_CHAT_MENU_RU;
-    private static final ReplyKeyboardMarkup REPLY_MODEL_CHOOSE_EN;
-    private static final ReplyKeyboardMarkup REPLY_CHAT_MENU_EN;
-    private static final InlineKeyboardMarkup INLINE_CHOOSE_LANGUAGE;
-
-
-    static
-    {
-        PREVIOUS = createOneRowReplyMarkup("previous");
-        EMPTY = createOneRowReplyMarkup("nullMarkup");
-
-        INLINE_BUY_TOKENS_RU = createInlineMarkup(List.of(createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty()), CallbackData.PRESSED_BUY_BUTTON.getData()))));
-        INLINE_BUY_TOKENS_EN = createInlineMarkup(List.of(createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS.getProperty()), CallbackData.PRESSED_BUY_BUTTON.getData()))));
-        INLINE_PRODUCT_LIST_RU = createInlineMarkup(List.of(createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))));
-        INLINE_PRODUCT_LIST_EN = createInlineMarkup(List.of(createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE.getProperty()), CallbackData.PRESSED_MINIMAL_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE.getProperty()), CallbackData.PRESSED_MEDIUM_PURCHASE_BUTTON.getData())), createInlineRow(createInlineButton(enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE.getProperty()), CallbackData.PRESSED_MAXIMUM_PURCHASE_BUTTON.getData()))));
-        INLINE_CHOOSE_LANGUAGE = createInlineMarkup(List.of(createInlineRow(createInlineButton(ruMsgProperties.getProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty()), CallbackData.PRESSED_RU_LANGUAGE_BUTTON.getData()), createInlineButton(enMsgProperties.getProperty(PropertiesKeys.MENU_LANGUAGE_TITLE.getProperty()), CallbackData.PRESSED_EN_LANGUAGE_BUTTON.getData()))));
-
-
-        REPLY_MODEL_CHOOSE_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
-        REPLY_CHAT_MENU_RU = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty()));
-        REPLY_MODEL_CHOOSE_EN = createOneRowReplyMarkup(ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT3_TITLE.getProperty()), ruMsgProperties.getProperty(PropertiesKeys.CHAT_GPT4_TITLE.getProperty()));
-        REPLY_CHAT_MENU_EN = createOneRowReplyMarkup(enMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT.getProperty()), enMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_CHAT.getProperty()));
-    }
 
     private static InlineKeyboardMarkup createInlineMarkup(List<List<InlineKeyboardButton>> rows)
     {
@@ -84,66 +51,97 @@ public class ReplyMarkups
         return keyboardMarkup;
     }
 
-    public static ReplyKeyboardMarkup getEMPTY()
+    public static ReplyKeyboardMarkup getEmpty()
     {
-        return EMPTY;
+        return createOneRowReplyMarkup("empty");
     }
 
-    public static ReplyKeyboardMarkup getPREVIOUS()
+    public static ReplyKeyboardMarkup getPrevious()
     {
-        return PREVIOUS;
+        return createOneRowReplyMarkup("previous");
     }
 
-    public static InlineKeyboardMarkup getInlineBuyTokens(LanguageCodes languageCode)
+    private static InlineKeyboardButton getReturnMenuButton(Languages language)
     {
-        if (languageCode.equals(LanguageCodes.EN))
-        {
-            return INLINE_BUY_TOKENS_EN;
-        }
-        else
-        {
-            return INLINE_BUY_TOKENS_RU;
-        }
+        String returnMenuTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.MENU_RETURN_TO_MENU_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.MENU_RETURN_TO_MENU_BUTTON_TITLE.getProperty());
+        return createInlineButton(returnMenuTitle, CallbackData.PRESSED_MENU_RETURN_BUTTON.getData());
     }
 
-    public static InlineKeyboardMarkup getInlineProductList(LanguageCodes languageCode)
+
+
+    public static InlineKeyboardMarkup getInlineBuyTokens(Languages language)
     {
-        if (languageCode.equals(LanguageCodes.EN))
-        {
-            return INLINE_PRODUCT_LIST_EN;
-        }
-        else
-        {
-            return INLINE_PRODUCT_LIST_RU;
-        }
+        String buyTokensTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.PURCHASE_BUY_TOKENS_BUTTON_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(buyTokensTitle, CallbackData.PRESSED_MENU_BUY_TOKENS_BUTTON.getData())),
+                createInlineRow(getReturnMenuButton(language))));
     }
 
-    public static ReplyKeyboardMarkup getReplyModelChoose(LanguageCodes languageCode)
+    public static InlineKeyboardMarkup getInlineProductList(Languages language)
     {
-        if (languageCode.equals(LanguageCodes.EN))
-        {
-            return REPLY_MODEL_CHOOSE_EN;
-        }
-        else
-        {
-            return REPLY_MODEL_CHOOSE_RU;
-        }
+        String minimalVal = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE_BUTTON_TITLE.getProperty());
+        String mediumVal = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MEDIUM_VALUE_BUTTON_TITLE.getProperty());
+        String maximumVal = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.PURCHASE_MAXIMUM_VALUE_BUTTON_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(minimalVal, CallbackData.PRESSED_PURCHASE_MINIMAL_BUTTON.getData())),
+                createInlineRow(createInlineButton(mediumVal, CallbackData.PRESSED_PURCHASE_MEDIUM_BUTTON.getData())),
+                createInlineRow(createInlineButton(maximumVal, CallbackData.PRESSED_PURCHASE_MAXIMUM_BUTTON.getData())),
+                createInlineRow(getReturnMenuButton(language))));
     }
 
-    public static ReplyKeyboardMarkup getReplyChatMenu(LanguageCodes languageCode)
+    public static InlineKeyboardMarkup getInlineChooseLanguage(Languages language)
     {
-        if (languageCode.equals(LanguageCodes.EN))
-        {
-            return REPLY_CHAT_MENU_EN;
-        }
-        else
-        {
-            return REPLY_CHAT_MENU_RU;
-        }
+        String ruLanguageTitle = ruMsgProperties.getProperty(PropertiesKeys.SETTINGS_LANGUAGE_TITLE.getProperty());
+        String enLanguageTitle = enMsgProperties.getProperty(PropertiesKeys.SETTINGS_LANGUAGE_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(ruLanguageTitle, CallbackData.PRESSED_SETTINGS_RU_LANGUAGE_BUTTON.getData()),
+                createInlineButton(enLanguageTitle, CallbackData.PRESSED_SETTINGS_EN_LANGUAGE_BUTTON.getData())),
+                createInlineRow(getReturnMenuButton(language))));
     }
 
-    public static InlineKeyboardMarkup getInlineChooseLanguage()
+
+    public static InlineKeyboardMarkup getInlineMainMenu(Languages language)
     {
-        return INLINE_CHOOSE_LANGUAGE;
+        String balanceTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.MENU_BALANCE_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.MENU_BALANCE_BUTTON_TITLE.getProperty());
+        String settingsTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.MENU_SETTINGS_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.MENU_SETTINGS_BUTTON_TITLE.getProperty());
+        String helpTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.MENU_HELP_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.MENU_HELP_BUTTON_TITLE.getProperty());
+
+       return createInlineMarkup(List.of(createInlineRow(createInlineButton(balanceTitle, CallbackData.PRESSED_MENU_BALANCE_BUTTON.getData())),
+               createInlineRow(createInlineButton(settingsTitle, CallbackData.PRESSED_MENU_SETTINGS_BUTTON.getData()),
+                       createInlineButton(helpTitle, CallbackData.PRESSED_MENU_HELP_BUTTON.getData()))));
     }
+
+    public static InlineKeyboardMarkup getInlineSettings(Languages language)
+    {
+        String languageTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.SETTINGS_LANGUAGE_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.SETTINGS_LANGUAGE_BUTTON_TITLE.getProperty());
+        String aiModelTitle = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.SETTINGS_AI_MODEL_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.SETTINGS_AI_MODEL_BUTTON_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(aiModelTitle, CallbackData.PRESSED_SETTINGS_AI_MODEL_BUTTON.getData())),
+                createInlineRow(createInlineButton(languageTitle, CallbackData.PRESSED_SETTINGS_LANGUAGE_BUTTON.getData())),
+                createInlineRow(getReturnMenuButton(language))));
+    }
+
+    public static InlineKeyboardMarkup getInlineAIModels(Languages language)
+    {
+        String gpt3Title = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty());
+        String gpt4Title = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(gpt3Title, CallbackData.PRESSED_SETTINGS_GPT3_BUTTON.getData()),
+                createInlineButton(gpt4Title, CallbackData.PRESSED_SETTINGS_GPT4_BUTTON.getData())),
+                createInlineRow(getReturnMenuButton(language))));
+    }
+
+    public static InlineKeyboardMarkup getInlineHelp(Languages language)
+    {
+        return createInlineMarkup(List.of(createInlineRow(getReturnMenuButton(language))));
+    }
+
+    public static ReplyKeyboardMarkup getReplyChatMenu(Languages language)
+    {
+        String endChat = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty());
+        String startNewChat = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty());
+
+        return createOneRowReplyMarkup(endChat, startNewChat);
+    }
+
 }
