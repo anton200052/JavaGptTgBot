@@ -15,7 +15,7 @@ public class TelegramBotUser extends User
 {
     private transient Properties msgProperties;
     private final Long chatId;
-    private Boolean isPremium;
+    private Boolean isVip;
     private Languages language;
     private Integer tokensBalance = 0;
     private GptModels gptModel;
@@ -25,13 +25,13 @@ public class TelegramBotUser extends User
     public TelegramBotUser(Long chatId, Long id, String firstName, Boolean isBot, String lastName, String userName, String languageCode, Boolean canJoinGroups, Boolean canReadAllGroupMessages, Boolean supportInlineQueries, Boolean isPremium, Boolean addedToAttachmentMenu)
     {
         super(id, firstName, isBot, lastName, userName, languageCode, canJoinGroups, canReadAllGroupMessages, supportInlineQueries, isPremium, addedToAttachmentMenu);
-        this.currentStatus = UserStatus.MAIN_MENU;
+        this.currentStatus = UserStatus.USER_MAIN_MENU;
         this.messageList = new ArrayList<>();
         gptModel = GptModels.GPT3;
         this.chatId = chatId;
         this.language = Languages.EN;
         this.msgProperties = PropertiesManager.getEnMsgProperties();
-        this.isPremium = false;
+        this.isVip = false;
     }
 
     @Serial
@@ -41,7 +41,7 @@ public class TelegramBotUser extends User
 
         this.language = Languages.EN;
         this.msgProperties = PropertiesManager.getEnMsgProperties();
-        this.currentStatus = UserStatus.MAIN_MENU;
+        this.currentStatus = UserStatus.USER_MAIN_MENU;
         this.messageList = new ArrayList<>();
     }
 
@@ -106,9 +106,14 @@ public class TelegramBotUser extends User
         this.gptModel = gptModel;
     }
 
-    public Boolean isPremium()
+    public void setIsVip(Boolean vip)
     {
-        return isPremium;
+        isVip = vip;
+    }
+
+    public Boolean getIsVip()
+    {
+        return isVip;
     }
     public List<ChatMessage> getMessageList()
     {

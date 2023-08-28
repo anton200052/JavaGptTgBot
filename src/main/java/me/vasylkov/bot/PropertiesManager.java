@@ -138,13 +138,12 @@ public class PropertiesManager
         // Errors
         properties.setProperty(PropertiesKeys.ERROR_NOT_A_TXT_FILE.getProperty(), "Ошибка! Файл должен быть формата .txt");
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty(), "Вы должны завершить чат с GPT чтобы совершить это действие");
-        properties.setProperty(PropertiesKeys.ERROR_INCORRECT_MODEL.getProperty(), "Выбрана неправильная модель, пожалуйста выберите одну из моделей предложенных в навигационном меню");
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty(), "Чтобы задать вопрос боту используйте команду: /startchat");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty(), "Ошибка! Неправильный формат ввода. Вы можете либо написать сообщение боту, либо отправить ему txt файл и он прочитает из него.");
         properties.setProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty(), "Ошибка при парсинге");
         properties.setProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty(), """
                 ❌ GPT-4 - это модель премиум-класса!
-                
+                                
                 ⚪ Для её использования вам необходим статус Premium
                 ⤷ /menu -> Баланс токенов
                 """);
@@ -182,40 +181,40 @@ public class PropertiesManager
 
                 ‼️ Оплата только через украинские карты, для оплаты в другой валюте обратитесь в нашу поддержку - /help ‼️
                 """);
-        properties.setProperty(PropertiesKeys.MENU_PREMIUM_BALANCE.getProperty(), """
+        properties.setProperty(PropertiesKeys.MENU_VIP_BALANCE.getProperty(), """
                 GPT-4:
-                🔴Премиум статус:
+                ⚪ВИП статус:
                 ⤷ ✅Активирован
-                
+                                
                 🟤Баланс
                 ⤷ У вас %d💰 GPT-4 токенов
-                
-                🍉Премиум статус вам даёт
+                                
+                🍉ВИП статус вам даёт
                 ⤷ Доступ к GPT-4
                 ⤷ Ввод с помощью голосовых сообщений
                 ⤷ Ввод с помощью текстовых файлов
-                
-               
+                                
+                               
                 Покупка токенов:
                 """);
 
         properties.setProperty(PropertiesKeys.MENU_DEFAULT_BALANCE.getProperty(), """
                 GPT-4:
-                🔴Премиум статус:
+                ⚪ВИП статус:
                 ⤷ ❌Дективирован
-                
+                                
                 🟤Баланс
                 ⤷ У вас %d💰 GPT-4 токенов
-                
-                💡 Примечание: Премиум статус можно получить посредством покупки
+                                
+                💡 Примечание: ВИП статус можно получить посредством покупки
                 любого количества токенов (нажмите кнопку снизу)
-                
-                🍉Премиум статус вам даёт
+                                
+                🍉ВИП статус вам даёт
                 ⤷ Доступ к GPT-4
                 ⤷ Ввод с помощью голосовых сообщений
                 ⤷ Ввод с помощью текстовых файлов
-                
-               
+                                
+                               
                 Покупка токенов:
                 """);
 
@@ -241,8 +240,8 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.MENU_HELP.getProperty(), """
                 💬 Свяжитесь с нами здесь по всем важным вопросам 💬
                 💻 Поддержка: (имя_пользователя) 🌟
-                
-                
+                                
+                                
                 Краткое руководство по использованию бота:
                                 
                 • Список команд расположен на левой стороне поля ввода сообщения. Чтобы ввести команду, просто нажмите на интересующую вас команду.
@@ -263,6 +262,54 @@ public class PropertiesManager
                 • Чем длиннее диалог, тем больше токенов используется сразу. Так что будьте экономны и начните новый чат после каждого вопроса, если вы не планируете вести диалог с ботом.
                 """);
 
+        //apanel
+        properties.setProperty(PropertiesKeys.APANEL_TITLE.getProperty(), "\uD83D\uDEE1️ Админ панель");
+        properties.setProperty(PropertiesKeys.APANEL_MSG_TO_ALL_BUTTON_TITLE.getProperty(), "\uD83D\uDCE3 Сообщение всем");
+        properties.setProperty(PropertiesKeys.APANEL_ADD_TOKENS_BUTTON_TITLE.getProperty(), "\uD83D\uDCBC Добавить токены");
+        properties.setProperty(PropertiesKeys.APANEL_USER_INFO_BUTTON_TITLE.getProperty(), "💡 Инфо. о польз.");
+        properties.setProperty(PropertiesKeys.APANEL_CANCEL_ACTION_BUTTON_TITLE.getProperty(), "❌ Отменить действие");
+        properties.setProperty(PropertiesKeys.APANEL_USER_NOT_FOUND.getProperty(), "Пользователь не найден");
+        properties.setProperty(PropertiesKeys.APANEL_TOKENS_ADDED.getProperty(), "Токены были успешно зачислены на баланс указанного пользователя");
+        properties.setProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty(), "Пользователь @%s отправил фото:");
+        properties.setProperty(PropertiesKeys.APANEL_MSG_TO_ALL_INSTRUCTIONS.getProperty(), """
+                🔴ВНИМАНИЕ🔴
+                ⤷ Ваше следующее сообщение, которое вы напишите в этот чат,
+                  будет отправлено всем пользователям бота.
+                                
+                ⤷ Это так же может быть фотография с или без подписи.
+                                
+                ⤷ Если вы хотите отменить это действие, нажмите кнопку ниже.
+                """);
+        properties.setProperty(PropertiesKeys.APANEL_ADD_TOKENS_INSTRUCTIONS.getProperty(), """
+                🔴ВНИМАНИЕ🔴
+                ⤷ Ваше следующее сообщение, которое вы напишите в этот чат,
+                  будет использовано для добавления токенов пользователю.
+                  
+                ⤷ Введите айди пользователя количество токенов, индикатор(true/false) будут ли токены добавлены к текущему значению, или установлены от нуля, индикатор(true/false) будет ли пользователь VIP после добавления.
+                
+                ⤷ Пример ввода: 123123 15000 true true
+                
+                ⤷ Если вы хотите отменить это действие, нажмите кнопку ниже.
+                """);
+        properties.setProperty(PropertiesKeys.APANEL_USER_INFO_INSTRUCTIONS.getProperty(), """
+                🔴ВНИМАНИЕ🔴
+                ⤷ Ваше следующее сообщение, которое вы напишите в этот чат,
+                  будет использовано для получения информации про пользователя.
+                  
+                ⤷ Введите айди пользователя.
+                
+                ⤷ Пример ввода: 123123
+                
+                ⤷ Если вы хотите отменить это действие, нажмите кнопку ниже.
+                """);
+        properties.setProperty(PropertiesKeys.APANEL_USER_INFO.getProperty(), """
+                Информация про %d:
+                ⤷ Айди: %d
+                ⤷ Чат айди: %d
+                ⤷ Юзернейм: %s
+                ⤷ Количество токенов: %d
+                ⤷ Вип: %b
+                """);
 
         // settings
         properties.setProperty(PropertiesKeys.SETTINGS_CHOOSE_LANGUAGE.getProperty(), "Выберите язык: ");
@@ -327,13 +374,6 @@ public class PropertiesManager
                 🔴 Если будет произведена оплата, но скриншот не будет отправлен, токены не будут зачислены.
                 """);
 
-        // Admin
-        properties.setProperty(PropertiesKeys.ADMIN_PRINT_USER_DATA.getProperty(), "Введите юзернейм пользователя и количество токенов в формате: (юзернейм количество)");
-        properties.setProperty(PropertiesKeys.ADMIN_USER_NOT_FOUND.getProperty(), "Пользователь не найден");
-        properties.setProperty(PropertiesKeys.ADMIN_TOKENS_ADDED.getProperty(), "Токены были успешно зачислены на баланс указанного пользователя");
-        properties.setProperty(PropertiesKeys.ADMIN_USER_SEND_PHOTO.getProperty(), "Пользователь @%s отправил фото:");
-        properties.setProperty(PropertiesKeys.ADMIN_SEND_MESSAGE_TO_ALL.getProperty(), "Введите сообщение которое будет отправлено всем пользователям.");
-
         return properties;
     }
 
@@ -344,13 +384,12 @@ public class PropertiesManager
         // Errors
         properties.setProperty(PropertiesKeys.ERROR_NOT_A_TXT_FILE.getProperty(), "Error! The file must be in .txt format.");
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_MAIN_MENU.getProperty(), "You must end the chat with GPT in order to perform this action.");
-        properties.setProperty(PropertiesKeys.ERROR_INCORRECT_MODEL.getProperty(), "Incorrect model selected. Please choose one of the models provided in the navigation menu.");
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty(), "To ask a question to the bot, use the command: /startchat");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty(), "Error! Incorrect input format. You can either send a message to the bot or send a txt file for it to read.");
         properties.setProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty(), "Parsing error");
         properties.setProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty(), """
                 ❌ GPT-4 is a Premium model!
-                
+                                
                 ⚪ To use it, you need to have Premium status
                 ⤷ /menu -> Tokens balance
                 """);
@@ -387,40 +426,40 @@ public class PropertiesManager
                     
                 ‼️ Payment only via Ukrainian cards, for payment in other currency contact our support - /help ‼️
                 """);
-        properties.setProperty(PropertiesKeys.MENU_PREMIUM_BALANCE.getProperty(), """
+        properties.setProperty(PropertiesKeys.MENU_VIP_BALANCE.getProperty(), """
                 GPT-4:
-                🔴Premium Status:
+                ⚪VIP Status:
                 ⤷ ✅Activated
-                
+                                
                 🟤Balance
                 ⤷ You have %d💰 GPT-4 tokens
-                
-                🍉Premium Status grants you
+                                
+                🍉VIP Status grants you
                 ⤷ Access to GPT-4
                 ⤷ Input using voice messages
                 ⤷ Input using text files
-                
-               
+                                
+                               
                 Token Purchase:
                 """);
 
         properties.setProperty(PropertiesKeys.MENU_DEFAULT_BALANCE.getProperty(), """
                 GPT-4:
-                🔴Premium Status:
+                ⚪VIP Status:
                 ⤷ ❌Deactivated
-                
+                                
                 🟤Balance
                 ⤷ You have %d💰 GPT-4 tokens
-                
-                💡 Note: Premium Status can be obtained by purchasing
+                                
+                💡 Note: VIP Status can be obtained by purchasing
                 any amount of tokens (press the button below)
-                
-                🍉Premium Status grants you
+                                
+                🍉VIP Status grants you
                 ⤷ Access to GPT-4
                 ⤷ Input using voice messages
                 ⤷ Input using text files
-                
-               
+                                
+                               
                 Token Purchase:
                 """);
         properties.setProperty(PropertiesKeys.MENU_START_1.getProperty(), """
@@ -444,8 +483,8 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.MENU_HELP.getProperty(), """
                 Contact us here for all important questions 💬
                 💻 Support: (username) 🌟
-                
-                
+                                
+                                
                 Quick guide to using the bot:
                         
                 • The list of commands is located on the left side of the message input field. To enter a command, simply click on the command you are interested in.
@@ -465,6 +504,57 @@ public class PropertiesManager
                 Important Note 2:
                 • The longer the dialogue, the more tokens are used at once. So be economical and start a new chat after each question if you're not planning to have a dialogue with the bot.
                 """);
+
+
+        //apanel
+        properties.setProperty(PropertiesKeys.APANEL_TITLE.getProperty(), "\uD83D\uDEE1️ Admin panel");
+        properties.setProperty(PropertiesKeys.APANEL_MSG_TO_ALL_BUTTON_TITLE.getProperty(), "\uD83D\uDCE3 Msg to all");
+        properties.setProperty(PropertiesKeys.APANEL_CANCEL_ACTION_BUTTON_TITLE.getProperty(), "❌ Cancel action");
+        properties.setProperty(PropertiesKeys.APANEL_ADD_TOKENS_BUTTON_TITLE.getProperty(), "\uD83D\uDCBC Add tokens");
+        properties.setProperty(PropertiesKeys.APANEL_USER_INFO_BUTTON_TITLE.getProperty(), "💡 Info about user");
+        properties.setProperty(PropertiesKeys.APANEL_ADD_TOKENS_INSTRUCTIONS.getProperty(), "Enter the username of the user and the number of tokens in the format: (username amount)");
+        properties.setProperty(PropertiesKeys.APANEL_USER_NOT_FOUND.getProperty(), "User not found");
+        properties.setProperty(PropertiesKeys.APANEL_TOKENS_ADDED.getProperty(), "Tokens have been successfully added to the balance of the specified user");
+        properties.setProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty(), "User @%s sent a photo:");
+        properties.setProperty(PropertiesKeys.APANEL_MSG_TO_ALL_INSTRUCTIONS.getProperty(), """
+                🔴ATTENTION🔴
+                ⤷ Your next message that you write in this chat
+                  will be sent to all users of the bot.
+                                
+                ⤷ This can also be a photo with or without a caption.
+                                
+                ⤷ If you want to cancel this action, press the button below.
+                """);
+        properties.setProperty(PropertiesKeys.APANEL_ADD_TOKENS_INSTRUCTIONS.getProperty(), """
+                🔴ATTENTION🔴
+                ⤷ Your next message that you write in this chat will be used for adding tokens to the user.
+                
+                ⤷ Enter the user's ID, the number of tokens, an indicator (true/false) whether the tokens will be added to the current value or set from zero, an indicator (true/false) whether the user will be VIP after the addition.
+                
+                ⤷ Input example: 123123 15000 true true
+                
+                ⤷ If you want to cancel this action, press the button below.
+                """);
+        properties.setProperty(PropertiesKeys.APANEL_USER_INFO_INSTRUCTIONS.getProperty(), """
+                🔴ATTENTION🔴
+                ⤷ Your next message that you write in this chat
+                  will be used to obtain information about the user.
+                  
+                ⤷ Enter the user ID.
+                
+                ⤷ Input example: 123123
+                
+                ⤷ If you want to cancel this action, press the button below.
+                """);
+        properties.setProperty(PropertiesKeys.APANEL_USER_INFO.getProperty(), """
+                Information about %d:
+                ⤷ ID: %d
+                ⤷ Chat ID: %d
+                ⤷ Username: %s
+                ⤷ Number of tokens: %d
+                ⤷ VIP: %b
+                """);
+
 
 
         // settings
@@ -489,7 +579,7 @@ public class PropertiesManager
                 🟢🟢⚪⚪⚪️ – Fast
                                 
                 🟢🟢🟢🟢🟢 – Cheap
-                
+                                
                          
                 🟣GPT-3.5:
                  ⤷
@@ -498,8 +588,8 @@ public class PropertiesManager
                 🟢🟢🟢⚪⚪ – Fast
                                 
                 🟢🟢🟢🟢🟢 – Cheap
-                
-           
+                                
+                           
                 🟣GPT-4:
                  ⤷
                 🟢🟢🟢🟢🟢 – Smart
@@ -530,13 +620,6 @@ public class PropertiesManager
                     
                 🔴 If payment is made but no screenshot is sent, the tokens will not be credited.
                 """);
-
-        // Admin
-        properties.setProperty(PropertiesKeys.ADMIN_PRINT_USER_DATA.getProperty(), "Enter the username of the user and the number of tokens in the format: (username amount)");
-        properties.setProperty(PropertiesKeys.ADMIN_USER_NOT_FOUND.getProperty(), "User not found");
-        properties.setProperty(PropertiesKeys.ADMIN_TOKENS_ADDED.getProperty(), "Tokens have been successfully added to the balance of the specified user");
-        properties.setProperty(PropertiesKeys.ADMIN_USER_SEND_PHOTO.getProperty(), "User @%s sent a photo:");
-        properties.setProperty(PropertiesKeys.ADMIN_SEND_MESSAGE_TO_ALL.getProperty(), "Enter the message that will be sent to all users.");
 
         return properties;
     }

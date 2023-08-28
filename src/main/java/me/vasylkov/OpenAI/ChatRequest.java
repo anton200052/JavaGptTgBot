@@ -95,7 +95,7 @@ public class ChatRequest
             }
             else
             {
-                instance.sendMessage(chatId, ReplyMarkups.getEmpty(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
+                instance.sendMessage(chatId, ReplyMarkups.getPrevious(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
                 return;
             }
         }

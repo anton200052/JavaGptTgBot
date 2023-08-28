@@ -136,6 +136,22 @@ public class ReplyMarkups
         return createInlineMarkup(List.of(createInlineRow(getReturnMenuButton(language))));
     }
 
+    public static InlineKeyboardMarkup getInlineCancelAction(Languages language)
+    {
+        String cancelButton = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.APANEL_CANCEL_ACTION_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.APANEL_CANCEL_ACTION_BUTTON_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(cancelButton, CallbackData.PRESSED_APANEL_CANCEL_ACTION_BUTTON.getData()))));
+    }
+
+    public static InlineKeyboardMarkup getInlineApanel(Languages language)
+    {
+        String msgToAllButton = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.APANEL_MSG_TO_ALL_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.APANEL_MSG_TO_ALL_BUTTON_TITLE.getProperty());
+        String addTokensButton = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.APANEL_ADD_TOKENS_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.APANEL_ADD_TOKENS_BUTTON_TITLE.getProperty());
+        String userInfoButton = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.APANEL_USER_INFO_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.APANEL_USER_INFO_BUTTON_TITLE.getProperty());
+
+        return createInlineMarkup(List.of(createInlineRow(createInlineButton(msgToAllButton, CallbackData.PRESSED_APANEL_MSG_TO_ALL_BUTTON.getData())), createInlineRow(createInlineButton(addTokensButton, CallbackData.PRESSED_APANEL_ADD_TOKENS_BUTTON.getData()), createInlineButton(userInfoButton, CallbackData.PRESSED_APANEL_USER_INFO_BUTTON.getData()))));
+    }
+
     public static ReplyKeyboardMarkup getReplyChatMenu(Languages language)
     {
         String endChat = language.equals(Languages.RU) ? ruMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty()) : enMsgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty());

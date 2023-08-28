@@ -15,7 +15,11 @@ public enum CallbackData
     PRESSED_SETTINGS_AI_MODEL_BUTTON("pressed_settings_ai_model_button"),
     PRESSED_SETTINGS_LANGUAGE_BUTTON("pressed_settings_language_button"),
     PRESSED_SETTINGS_GPT3_BUTTON("pressed_settings_gpt3_button"),
-    PRESSED_SETTINGS_GPT4_BUTTON("pressed_settings_gpt4_button");
+    PRESSED_SETTINGS_GPT4_BUTTON("pressed_settings_gpt4_button"),
+    PRESSED_APANEL_MSG_TO_ALL_BUTTON("pressed_apanel_msg_to_all_button"),
+    PRESSED_APANEL_ADD_TOKENS_BUTTON("pressed_apanel_add_tokens_button"),
+    PRESSED_APANEL_USER_INFO_BUTTON("pressed_apanel_user_info_button"),
+    PRESSED_APANEL_CANCEL_ACTION_BUTTON("pressed_apanel_cancel_action_button");
 
     private String data;
 
