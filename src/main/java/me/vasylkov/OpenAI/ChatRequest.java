@@ -1,14 +1,12 @@
 package me.vasylkov.OpenAI;
 
-import com.knuddels.jtokkit.Encodings;
-import com.knuddels.jtokkit.api.Encoding;
-import com.knuddels.jtokkit.api.ModelType;
 import com.theokanning.openai.OpenAiHttpException;
 import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.completion.chat.ChatMessageRole;
 import com.theokanning.openai.service.OpenAiService;
+import com.theokanning.openai.utils.TikTokensUtil;
 import me.vasylkov.bot.*;
 
 import java.time.Duration;
@@ -18,96 +16,77 @@ import java.util.Properties;
 
 public class ChatRequest
 {
+    private final TelegramBot instance;
     private final TelegramBotUser user;
     private final String message;
     private final GptModels model;
-    private static final Encoding enc = Encodings.newDefaultEncodingRegistry().getEncodingForModel(ModelType.GPT_4);
-    public static final Integer GPT3_MAX_TOKENS = 9000;
-    public static final Integer GPT4_MAX_TOKENS = 1000;
     private static final Properties configProperties = PropertiesManager.getConfigProperties();
+    private static final String GPT_3_VERSION = configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty());
+    private static final String GPT_4_VERSION = configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty());
+    public static final Integer GPT3_MAX_TOKENS = Integer.valueOf(configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_MAX_TOKENS.getProperty()));
+    public static final Integer GPT4_MAX_TOKENS = Integer.valueOf(configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_MAX_TOKENS.getProperty()));
     private static final String GPT_3_TOKEN = configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty());
     private static final String GPT_4_TOKEN = configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty());
 
-    public ChatRequest(TelegramBotUser user, String message, GptModels model)
+    public ChatRequest(TelegramBot instance, TelegramBotUser user, String message, GptModels model)
     {
+        this.instance = instance;
         this.user = user;
         this.message = message;
         this.model = model;
     }
 
-    private int countPromptTokens()
-    {
-        int totalCount = 0;
-        for (ChatMessage msg : user.getMessageList())
-        {
-            totalCount += enc.countTokens(msg.getContent());
-        }
-        return totalCount;
-    }
-
-    private int countCompletionTokens(String msg)
-    {
-        return enc.countTokens(msg);
-    }
-
-    private void createChat(TelegramBot instance, int tokens, Boolean isException)
+    private void createChat()
     {
         Long chatId = user.getChatId();
         try
         {
             synchronized (user.getMessageList())
             {
+                List<ChatMessage> msgList = user.getMessageList();
                 int waitMsgId = instance.sendMessage(chatId, ReplyMarkups.getPrevious(), user.getMsgProperties().getProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty()));
-                if (!isException)
+                LogManager.writeToLogFile(user, message);
+
+                ChatMessage msg = new ChatMessage(ChatMessageRole.USER.value(), message);
+                msgList.add(msg);
+
+                while (model.equals(GptModels.GPT3) ? TikTokensUtil.tokens(TikTokensUtil.ModelEnum.GPT_3_5_TURBO.getName(), msgList) > GPT3_MAX_TOKENS - 700
+                        : TikTokensUtil.tokens(TikTokensUtil.ModelEnum.GPT_4.getName(), msgList) > GPT4_MAX_TOKENS - 700)
                 {
-                    //LogFiles.writeToRequestLog(user, message, model);
-                    ChatMessage msg = new ChatMessage(ChatMessageRole.USER.value(), message);
-                    user.getMessageList().add(msg);
+                    msgList.remove(0);
+                    msgList.remove(0);
                 }
 
-                if (model.equals(GptModels.GPT4) && user.getMessageList().size() > 6)
-                {
-                    user.getMessageList().remove(0);
-                    user.getMessageList().remove(0);
-                }
+                OpenAiService service = new OpenAiService(model.equals(GptModels.GPT3) ? GPT_3_TOKEN : GPT_4_TOKEN, Duration.ofSeconds(100));
+                ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder()
+                        .model(model.equals(GptModels.GPT3) ? GPT_3_VERSION : GPT_4_VERSION)
+                        .messages(msgList)
+                        .n(1)
+                        .maxTokens(model.equals(GptModels.GPT4) ? (user.getTokensBalance() < GPT4_MAX_TOKENS ? user.getTokensBalance() : GPT4_MAX_TOKENS) : GPT3_MAX_TOKENS)
+                        .logitBias(new HashMap<>()).build();
 
-                OpenAiService service = new OpenAiService(model.equals(GptModels.GPT3) ? GPT_3_TOKEN : GPT_4_TOKEN, Duration.ofSeconds(10000));
-                ChatCompletionRequest chatCompletionRequest = ChatCompletionRequest.builder().model(model.equals(GptModels.GPT3) ? "gpt-3.5-turbo-16k" : "gpt-4").messages(user.getMessageList()).n(1).maxTokens(tokens).logitBias(new HashMap<>()).build();
                 List<ChatCompletionChoice> choices = service.createChatCompletion(chatCompletionRequest).getChoices();
                 instance.deleteMessage(user.getChatId(), waitMsgId);
                 instance.sendMessage(chatId, ReplyMarkups.getReplyChatMenu(user.getLanguage()), choices.get(0).getMessage().getContent());
+                msgList.add(choices.get(0).getMessage());
 
                 if (model.equals(GptModels.GPT4))
                 {
-                    user.setTokensBalance(user.getTokensBalance() - (countPromptTokens() + countCompletionTokens(choices.get(0).getMessage().getContent())));
+                    user.setTokensBalance(user.getTokensBalance() - (TikTokensUtil.tokens(TikTokensUtil.ModelEnum.GPT_4.getName(), msgList)));
                     DataSerializer.serializeUsersList();
                 }
-                user.getMessageList().add(choices.get(0).getMessage());
-            }
-        }
-        catch (OpenAiHttpException e)
-        {
-            if (model.equals(GptModels.GPT3) && user.getMessageList().size() >= 6)
-            {
-                user.getMessageList().remove(0);
-                user.getMessageList().remove(0);
-                createChat(instance, GPT3_MAX_TOKENS, true);
-            }
-            else
-            {
-                instance.sendMessage(chatId, ReplyMarkups.getPrevious(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
-                return;
             }
         }
         catch (RuntimeException e)
         {
-            e.printStackTrace();
+            instance.sendMessage(chatId, ReplyMarkups.getEmpty(), user.getMsgProperties().getProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty()));
+            user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
         }
     }
 
-    public void sendNewChatRequest(TelegramBot instance, int tokens)
+    public void sendNewChatRequest()
     {
-        Thread thread = new Thread(() -> createChat(instance, tokens, false));
+        Thread thread = new Thread(this::createChat);
         thread.start();
     }
 }

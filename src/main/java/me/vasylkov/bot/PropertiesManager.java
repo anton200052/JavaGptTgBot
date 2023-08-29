@@ -60,7 +60,7 @@ public class PropertiesManager
         }
     }
 
-    public static void loadConfigProperties() throws NotValidConfigDataException
+    public static void loadConfigProperties()
     {
         if (!Files.exists(configPropertiesPath))
         {
@@ -97,10 +97,41 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty(), "empty");
+        properties.setProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty(), "empty");
+        properties.setProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty(), "empty");
+        properties.setProperty(PropertiesKeys.CONFIG_GPT3_MAX_TOKENS.getProperty(), "empty");
+        properties.setProperty(PropertiesKeys.CONFIG_GPT4_MAX_TOKENS.getProperty(), "empty");
         return properties;
     }
 
-    public static Properties initConfigProperties() throws NotValidConfigDataException
+    private static boolean isConfigPropertiesDataValid()
+    {
+        if (configProperties.getProperty(PropertiesKeys.CONFIG_BOT_USERNAME.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_BOT_USERNAME.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_BOT_TOKEN.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_BOT_TOKEN.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_MAX_TOKENS.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_MAX_TOKENS.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_MAX_TOKENS.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_MAX_TOKENS.getProperty()).equals("empty"))
+        {
+            return false;
+        }
+        return true;
+    }
+
+
+    public static Properties initConfigProperties()
     {
         Properties properties = new Properties();
 
@@ -121,12 +152,16 @@ public class PropertiesManager
             System.out.println("Enter admins telegram id`s. Format: id1,id2,id3,id4\n");
             properties.setProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty(), bufferedReader.readLine());
 
+            properties.setProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty(), "gpt-3.5-turbo-16k");
+            properties.setProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty(), "gpt-4");
+            properties.setProperty(PropertiesKeys.CONFIG_GPT3_MAX_TOKENS.getProperty(), "9000");
+            properties.setProperty(PropertiesKeys.CONFIG_GPT4_MAX_TOKENS.getProperty(), "1000");
 
-            System.out.println("If you want to change or add anything. For example, to change the username or token of the bot,\njust open the config.properties file through any text editor in the root directory of the jar file");
+            System.out.println("If you want to change or add anything. For example, to change the username or token of the bot,\njust open the config.properties file through any text editor in the root directory of the jar file.\nAlso you can change gpt version and max tokens");
         }
         catch (IOException e)
         {
-            throw new NotValidConfigDataException("Откройте файл config.properties и замените слова empty соответствующими данными для каждого поля. Если вы повторно видите это сообщение тогда удалите файл и заполните его заново");
+            e.printStackTrace();
         }
         return properties;
     }
@@ -155,14 +190,16 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty(), """
                 Ошибка при попытке получить ответ от OpenAI.
                 Возможные причины:
-                - Слишком большое количество одновременных запросов.
-                - Перегрузка серверов OpenAI.
+                ⤷ Слишком большое количество одновременных запросов.
+                ⤷ Перегрузка серверов OpenAI.
                 Решение:
-                - Используйте команду /startchat и повторите свой запрос.
+                ⤷ Используйте команду /startchat и повторите свой запрос.
                    
                 """);
-        properties.setProperty(PropertiesKeys.ERROR_USERNAME_NOT_AVAILABLE.getProperty(), """
-                Для того, чтобы использовать Telegram-бота, добавьте его юзернейм или сделайте его публичным в настройках Telegram.
+        properties.setProperty(PropertiesKeys.ERROR_NULL_BALANCE.getProperty(), """
+                На вашем балансе недостаточно токенов для чата с GPT-4!
+                Пополнение токенов:
+                ⤷ /menu - Баланс
                 """);
 
         // menu
@@ -171,7 +208,6 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.MENU_BALANCE_BUTTON_TITLE.getProperty(), "\uD83C\uDF49 Баланс токенов");
         properties.setProperty(PropertiesKeys.MENU_SETTINGS_BUTTON_TITLE.getProperty(), "⚙️ Настройки");
         properties.setProperty(PropertiesKeys.MENU_TITLE.getProperty(), "\uD83C\uDFE0 Меню:");
-        properties.setProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty(), "Вы успешно начали чат с моделью GPT");
         properties.setProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty(), "Вы вернулись в главное меню.");
         properties.setProperty(PropertiesKeys.MENU_PRODUCT_LIST.getProperty(), """
                 💌 Сколько токенов вы хотите приобрести?
@@ -217,7 +253,6 @@ public class PropertiesManager
                                
                 Покупка токенов:
                 """);
-
         properties.setProperty(PropertiesKeys.MENU_START_1.getProperty(), """
                 Привет! 😄 Я самый передовой искусственный интеллект в мире (созданный OpenAI)! 🌟
                                
@@ -230,16 +265,16 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.MENU_START_2.getProperty(), """
                 Прежде чем мы начнем, есть 2 важные вещи, которые стоит знать: ✌️
                                 
-                1. Вы можете общаться со мной на любом языке. Но я наиболее эффективно работаю на 🇬🇧 английском языке! 💬💪
+                1. Вы можете изменить язык интерфейса в настройках!
+                   ⤷ /menu - Настройки
                                 
-                2. Если вам нужна дополнительная информация, просто отправьте мне команду /help, и я буду рад вам помочь! 🤗
-                                
-                👩🏼‍💻 Поддержка: @lavviku 🌟
+                2. Если вам нужна дополнительная информация, просто отправьте мне команду:
+                   ⤷ /menu - Помощь
                 """);
 
         properties.setProperty(PropertiesKeys.MENU_HELP.getProperty(), """
                 💬 Свяжитесь с нами здесь по всем важным вопросам 💬
-                💻 Поддержка: (имя_пользователя) 🌟
+                💻 Поддержка: @lavviku 🌟
                                 
                                 
                 Краткое руководство по использованию бота:
@@ -249,14 +284,18 @@ public class PropertiesManager
                                 
                 Шаги взаимодействия с ботом:
                                 
-                1. Чтобы задать вопрос боту, используйте команду /startchat.
-                2. Затем выберите желаемую модель чата из навигационного меню.
-                3. После выбора модели просто отправьте сообщение боту с вашим интересующим вопросом.
+                1. Чтобы задать вопрос боту, используйте команду /startchat. По умолчанию стоит бесплатная модель - GPT3.5, изменить её можно в настройках:
+                   ⤷ /menu - Настройки
+                   
+                3. Далее отправьте сообщение боту с вашим интересующим вопросом.
+                
                 4. Дождитесь ответа на ваш запрос (генерация занимает до 3 минут).
+                
                 5. Если вы хотите переключиться на другую модель чата, выберите опцию "Начать новый чат" в навигационном меню. Затем следуйте шагам, начиная с пункта номер 3.
                                 
                 Важное примечание 1:
-                • Доступ к модели GPT-3.5 неограничен, и вы можете использовать этот режим без расходования токенов. Для использования GPT-4 вам нужно иметь более 300 токенов на балансе. Проверьте баланс / пополните токены - /balance
+                • Доступ к модели GPT-3.5 неограничен, и вы можете использовать этот режим без расходования токенов(бесплатно). Для использования GPT-4 вам нужно иметь VIP статус и токены на балансе. Покупка токенов:
+                  ⤷ /menu - Баланс
                                 
                 Важное примечание 2:
                 • Чем длиннее диалог, тем больше токенов используется сразу. Так что будьте экономны и начните новый чат после каждого вопроса, если вы не планируете вести диалог с ботом.
@@ -270,7 +309,7 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.APANEL_CANCEL_ACTION_BUTTON_TITLE.getProperty(), "❌ Отменить действие");
         properties.setProperty(PropertiesKeys.APANEL_USER_NOT_FOUND.getProperty(), "Пользователь не найден");
         properties.setProperty(PropertiesKeys.APANEL_TOKENS_ADDED.getProperty(), "Токены были успешно зачислены на баланс указанного пользователя");
-        properties.setProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty(), "Пользователь @%s отправил фото:");
+        properties.setProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty(), "Пользователь %d отправил фото:");
         properties.setProperty(PropertiesKeys.APANEL_MSG_TO_ALL_INSTRUCTIONS.getProperty(), """
                 🔴ВНИМАНИЕ🔴
                 ⤷ Ваше следующее сообщение, которое вы напишите в этот чат,
@@ -358,7 +397,13 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty(), "\uD83E\uDDE0ChatGPT генерирует ответ...");
         properties.setProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty(), "Завершить чат \uD83D\uDCA7");
         properties.setProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty(), "Начать новый чат \uD83D\uDD25");
-
+        properties.setProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty(), """
+                Вы начали чат с моделью:
+                %s
+                
+                ⚪️ Изменить модель:
+                   ⤷ /menu - Настройки
+                """);
 
         // Purchase
         properties.setProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+25К токенов - 119 UAH (-40%)");
@@ -367,7 +412,7 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.PURCHASE_BUY_TOKENS_BUTTON_TITLE.getProperty(), "\uD83E\uDD51Купить токены");
         properties.setProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty(), """
                 ⚪ Отправьте %d UAH на данную карту:
-                ‼️MonoBank‼️→ (CARD NUMBER)
+                ‼️MonoBank‼️→ 4441 1144 6601 4014
                     
                 ⚪ После оплаты отправьте скриншот успешного перевода в чат и ожидайте начисления в течение 10 минут.
                     
@@ -401,13 +446,15 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.ERROR_REQUEST_ERROR.getProperty(), """
                 Error while trying to receive a response from OpenAI.
                 Possible reasons:
-                - Too many concurrent requests.
-                - OpenAI server overload.
+                ⤷ Too many concurrent requests.
+                ⤷ OpenAI server overload.
                 Solution:
-                - Use the /startchat command and retry your request.
+                ⤷ Use the /startchat command and retry your request.
                 """);
-        properties.setProperty(PropertiesKeys.ERROR_USERNAME_NOT_AVAILABLE.getProperty(), """
-                To use the Telegram bot, add its username or make it public in your Telegram settings.
+        properties.setProperty(PropertiesKeys.ERROR_NULL_BALANCE.getProperty(), """
+                Your balance doesn't have enough tokens for chatting with GPT-4!
+                To replenish your tokens:
+                ⤷ /menu - Balance
                 """);
 
         //menu
@@ -416,7 +463,6 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.MENU_SETTINGS_BUTTON_TITLE.getProperty(), "⚙️ Settings");
         properties.setProperty(PropertiesKeys.MENU_BALANCE_BUTTON_TITLE.getProperty(), "\uD83C\uDF49 Tokens balance");
         properties.setProperty(PropertiesKeys.MENU_TITLE.getProperty(), "\uD83C\uDFE0 Menu:");
-        properties.setProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty(), "You have successfully started a chat with the GPT model.");
         properties.setProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty(), "You have been returned to the main menu.");
         properties.setProperty(PropertiesKeys.MENU_PRODUCT_LIST.getProperty(), """
                 💌 How many tokens would you like to purchase?
@@ -473,37 +519,42 @@ public class PropertiesManager
                 """);
         properties.setProperty(PropertiesKeys.MENU_START_2.getProperty(), """
                 Before we begin, there are 2 important things to know: ✌️
-                        
-                1. You can communicate with me in any language. But I work most effectively in 🇬🇧 English! 💬💪
-                        
-                2. If you need additional information, simply send me the /help command, and I'll be happy to assist you! 🤗
-                        
-                👩🏼‍💻 Support: @lavviku 🌟
+                
+                1. You can change the interface language in the settings!
+                   ⤷ /menu - Settings
+                
+                2. If you need additional information, simply send me the command:
+                   ⤷ /menu - Help
                 """);
         properties.setProperty(PropertiesKeys.MENU_HELP.getProperty(), """
-                Contact us here for all important questions 💬
-                💻 Support: (username) 🌟
-                                
-                                
+                💬 Contact us here for all important inquiries 💬
+                💻 Support: @lavviku 🌟
+                
+                
                 Quick guide to using the bot:
-                        
-                • The list of commands is located on the left side of the message input field. To enter a command, simply click on the command you are interested in.
-                • "Navigation menu" is a choice of action, similar to selecting a command, but it's a dynamic list that appears when you need to press something. Usually, the list appears right under the input field, but if it doesn't, you can activate it by clicking the button to the right of the input field.
-                        
+                
+                • The list of commands is located on the left side of the message input field. To input a command, simply click on the command you're interested in.
+                • "Navigation menu" is a selection of actions similar to choosing a command, but it's a dynamic list that appears when you need to make a choice. Usually, the list appears right below the input field, but if it doesn't, you can activate it by clicking the button to the right of the input field.
+                
                 Steps to interact with the bot:
-                        
-                1. To ask a question to the bot, use the /startchat command.
-                2. Next, choose the desired chat model from the navigation menu.
-                3. After selecting the model, simply send a message to the bot with your question of interest.
+                
+                1. To ask the bot a question, use the command /startchat. By default, the free model GPT3.5 is used; you can change it in the settings:
+                   ⤷ /menu - Settings
+                   
+                3. Then send a message to the bot with your question of interest.
+                
                 4. Wait for a response to your request (generation takes up to 3 minutes).
-                5. If you want to switch chat models, choose the "Start a new chat" option in the navigation menu. Then follow the steps starting from point number 3.
-                        
-                Important Note 1:
-                • Access to the GPT-3.5 model is unlimited, and you can use this mode without spending tokens. To use GPT-4, you need to have more than 300 tokens on your balance. Check balance/top up tokens - /balance
-                        
-                Important Note 2:
-                • The longer the dialogue, the more tokens are used at once. So be economical and start a new chat after each question if you're not planning to have a dialogue with the bot.
+                
+                5. If you want to switch to another chat model, select the option "Start a new chat" in the navigation menu. Then follow the steps, starting from step number 3.
+                
+                Important note 1:
+                • Access to the GPT-3.5 model is unlimited, and you can use this mode without spending tokens (for free). To use GPT-4, you need to have VIP status and tokens in your balance. Token purchase:
+                   ⤷ /menu - Balance
+                
+                Important note 2:
+                • The longer the dialogue, the more tokens are used at once. So be economical and start a new chat after each question if you don't plan to have an extended conversation with the bot.
                 """);
+
 
 
         //apanel
@@ -515,7 +566,7 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.APANEL_ADD_TOKENS_INSTRUCTIONS.getProperty(), "Enter the username of the user and the number of tokens in the format: (username amount)");
         properties.setProperty(PropertiesKeys.APANEL_USER_NOT_FOUND.getProperty(), "User not found");
         properties.setProperty(PropertiesKeys.APANEL_TOKENS_ADDED.getProperty(), "Tokens have been successfully added to the balance of the specified user");
-        properties.setProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty(), "User @%s sent a photo:");
+        properties.setProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty(), "User %d sent a photo:");
         properties.setProperty(PropertiesKeys.APANEL_MSG_TO_ALL_INSTRUCTIONS.getProperty(), """
                 🔴ATTENTION🔴
                 ⤷ Your next message that you write in this chat
@@ -605,6 +656,13 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.CHAT_REQUEST_WAITING.getProperty(), "\uD83E\uDDE0ChatGPT is generating a response...");
         properties.setProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty(), "End chat \uD83D\uDCA7");
         properties.setProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty(), "Start new chat \uD83D\uDD25");
+        properties.setProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty(), """
+                You've started a chat with model:
+                %s
+                
+                ⚪️ Change the model:
+                   ⤷ /menu - Settings
+                """);
 
 
         // Purchase
@@ -614,7 +672,7 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.PURCHASE_BUY_TOKENS_BUTTON_TITLE.getProperty(), "\uD83E\uDD51Buy Tokens");
         properties.setProperty(PropertiesKeys.PURCHASE_FINAL_MSG.getProperty(), """
                 ⚪ Send %d UAH to this card:
-                ‼️MonoBank‼️→ (CARD NUMBER)
+                ‼️MonoBank‼️→ 4441 1144 6601 4014
                     
                 ⚪ After payment, send a screenshot of the successful transfer to the chat and wait for the tokens to be credited within 10 minutes.
                     
@@ -626,9 +684,9 @@ public class PropertiesManager
 
     private static void storeProperties(Path path, Properties properties)
     {
-        try (FileOutputStream fileOutputStream = new FileOutputStream(path.toString()))
+        try (FileWriter fileWriter = new FileWriter(path.toString()))
         {
-            properties.store(fileOutputStream, "Config file");
+            properties.store(fileWriter, "Config file");
         }
         catch (IOException e)
         {
@@ -648,15 +706,6 @@ public class PropertiesManager
             e.printStackTrace();
         }
         return properties;
-    }
-
-    private static boolean isConfigPropertiesDataValid()
-    {
-        if (configProperties.getProperty(PropertiesKeys.CONFIG_BOT_USERNAME.getProperty()) == null || configProperties.getProperty(PropertiesKeys.CONFIG_BOT_USERNAME.getProperty()).equals("empty") || configProperties.getProperty(PropertiesKeys.CONFIG_BOT_TOKEN.getProperty()) == null || configProperties.getProperty(PropertiesKeys.CONFIG_BOT_TOKEN.getProperty()).equals("empty") || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty()) == null || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty()).equals("empty") || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty()) == null || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty()).equals("empty") || configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()) == null || configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()).equals("empty"))
-        {
-            return false;
-        }
-        return true;
     }
 
     public static Properties getConfigProperties()

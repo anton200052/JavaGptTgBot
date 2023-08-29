@@ -66,6 +66,7 @@ public class TelegramBot extends TelegramLongPollingBot
             {
                 user = new TelegramBotUser(chatId, tempUser.getId(), tempUser.getFirstName(), tempUser.getIsBot(), tempUser.getLastName(), tempUser.getUserName(), tempUser.getLanguageCode(), tempUser.getCanJoinGroups(), tempUser.getCanReadAllGroupMessages(), tempUser.getSupportInlineQueries(), tempUser.getIsPremium(), tempUser.getAddedToAttachmentMenu());
                 usersList.add(user);
+                LogManager.createLogFileIfNotExist(user);
                 DataSerializer.serializeUsersList();
             }
 
@@ -225,8 +226,16 @@ public class TelegramBot extends TelegramLongPollingBot
             }
             else if (cmd.equals("/startchat"))
             {
-                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), msgProperties.getProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty()),
+                        user.getGptModel().equals(GptModels.GPT3) ? msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
+
                 user.setCurrentStatus(UserStatus.USER_CHAT_WITH_GPT);
+            }
+            else if (cmd.equals("/bugexit"))
+            {
+                user.getMessageList().clear();
+                user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty()));
             }
             if (adminsId.contains(user.getId()))
             {
@@ -265,6 +274,9 @@ public class TelegramBot extends TelegramLongPollingBot
 
         else if (user.getCurrentStatus().equals(UserStatus.USER_CHAT_WITH_GPT))
         {
+            Integer currentTokens = user.getTokensBalance();
+            GptModels currentModel = user.getGptModel();
+
             if (msg.equals(msgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty())))
             {
                 user.getMessageList().clear();
@@ -276,12 +288,31 @@ public class TelegramBot extends TelegramLongPollingBot
             else if (msg.equals(msgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty())))
             {
                 user.getMessageList().clear();
-                sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.MENU_START_GPT_CHAT.getProperty()));
+                sendMessage(chatId, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty()),
+                        user.getGptModel().equals(GptModels.GPT3) ? msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
                 return;
             }
 
-            ChatRequest chatRequest = new ChatRequest(user, msg, user.getGptModel().equals(GptModels.GPT3) ? GptModels.GPT3 : GptModels.GPT4);
-            chatRequest.sendNewChatRequest(this, user.getGptModel().equals(GptModels.GPT3) ? ChatRequest.GPT3_MAX_TOKENS : ChatRequest.GPT4_MAX_TOKENS);
+            if (currentModel.equals(GptModels.GPT3))
+            {
+
+                ChatRequest chatRequest = new ChatRequest(this, user, msg, GptModels.GPT3);
+                chatRequest.sendNewChatRequest();
+
+            }
+            else if (currentModel.equals(GptModels.GPT4))
+            {
+                if (currentTokens > 0 && user.getIsVip())
+                {
+                    ChatRequest chatRequest = new ChatRequest(this, user, msg, GptModels.GPT4);
+                    chatRequest.sendNewChatRequest();
+                }
+                else
+                {
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NULL_BALANCE.getProperty()));
+                    user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
+                }
+            }
         }
 
         else
@@ -297,7 +328,7 @@ public class TelegramBot extends TelegramLongPollingBot
         String caption = message.getCaption();
         for (Long id : adminsId)
         {
-            sendMessage(id, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty()), user.getUserName()));
+            sendMessage(id, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.APANEL_USER_SEND_PHOTO.getProperty()), user.getId()));
             sendPhoto(id, new InputFile(fileId), caption);
         }
 
@@ -345,6 +376,7 @@ public class TelegramBot extends TelegramLongPollingBot
                 editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
                 editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
                 sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.SETTINGS_MODEL_CHANGED.getProperty()), msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty())));
+                DataSerializer.serializeUsersList();
             }
 
             else if (data.equals(CallbackData.PRESSED_SETTINGS_GPT4_BUTTON.getData()))
@@ -355,6 +387,7 @@ public class TelegramBot extends TelegramLongPollingBot
                     editMessageText(chatId, messageId, msgProperties.getProperty(PropertiesKeys.SETTINGS_TITLE.getProperty()));
                     editMessageInlineKeyboard(chatId, messageId, ReplyMarkups.getInlineSettings(language));
                     sendMessage(chatId, ReplyMarkups.getEmpty(), String.format(msgProperties.getProperty(PropertiesKeys.SETTINGS_MODEL_CHANGED.getProperty()), msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
+                    DataSerializer.serializeUsersList();
                 }
                 else
                 {

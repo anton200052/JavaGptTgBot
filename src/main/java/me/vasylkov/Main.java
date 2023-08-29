@@ -1,6 +1,6 @@
 package me.vasylkov;
 import me.vasylkov.bot.DataSerializer;
-import me.vasylkov.bot.NotValidConfigDataException;
+import me.vasylkov.bot.LogManager;
 import me.vasylkov.bot.PropertiesManager;
 import me.vasylkov.bot.TelegramBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -34,19 +34,13 @@ public class Main
 
     private static void setupBotFiles()
     {
-        try
-        {
-            PropertiesManager.loadConfigProperties();
-        }
-        catch (NotValidConfigDataException e)
-        {
-            System.out.println(e.getMessage());
-        }
-
+        PropertiesManager.loadConfigProperties();
         PropertiesManager.loadMsgProperties();
 
 
         DataSerializer.loadStorageFile();
         DataSerializer.deserializeUsersList();
+
+        LogManager.createLogDirIfNotExist();
     }
 }
