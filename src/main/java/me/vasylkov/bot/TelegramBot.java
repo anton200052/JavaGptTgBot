@@ -1,6 +1,7 @@
 package me.vasylkov.bot;
 
 import me.vasylkov.OpenAI.ChatRequest;
+import me.vasylkov.OpenAI.SpeechRecognition;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -9,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.*;
+import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboard;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
@@ -16,8 +18,12 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -101,7 +107,12 @@ public class TelegramBot extends TelegramLongPollingBot
 
             else if (update.getMessage().hasPhoto())
             {
-                handlePhotos(user, update.getMessage());
+                handlePhotos(user, message);
+            }
+
+            else if (update.getMessage().hasVoice())
+            {
+                handleVoices(user, message);
             }
         }
 
@@ -121,7 +132,12 @@ public class TelegramBot extends TelegramLongPollingBot
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         sendMessage.setText(textToSend);
-        sendMessage.enableMarkdown(true);
+
+        if (textToSend.contains("```"))
+        {
+            sendMessage.enableMarkdown(true);
+        }
+
         try
         {
             if (!markup.equals(ReplyMarkups.getPrevious()))
@@ -213,6 +229,14 @@ public class TelegramBot extends TelegramLongPollingBot
         Properties msgProperties = user.getMsgProperties();
         Languages language = user.getLanguage();
         Long chatId = user.getChatId();
+
+        if (cmd.equals("/bugexit"))
+        {
+            user.getMessageList().clear();
+            user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
+            sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty()));
+        }
+
         if (!user.getCurrentStatus().equals(UserStatus.USER_CHAT_WITH_GPT))
         {
             if (cmd.equals("/start"))
@@ -226,17 +250,12 @@ public class TelegramBot extends TelegramLongPollingBot
             }
             else if (cmd.equals("/startchat"))
             {
-                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty()),
-                        user.getGptModel().equals(GptModels.GPT3) ? msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
+                sendMessage(chatId, ReplyMarkups.getReplyChatMenu(language), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty()), user.getGptModel().equals(GptModels.GPT3) ? msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
 
                 user.setCurrentStatus(UserStatus.USER_CHAT_WITH_GPT);
             }
-            else if (cmd.equals("/bugexit"))
-            {
-                user.getMessageList().clear();
-                user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
-                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.MENU_RETURNED_TO_MAIN_MENU.getProperty()));
-            }
+
+
             if (adminsId.contains(user.getId()))
             {
                 if (cmd.equals("/apanel"))
@@ -274,9 +293,6 @@ public class TelegramBot extends TelegramLongPollingBot
 
         else if (user.getCurrentStatus().equals(UserStatus.USER_CHAT_WITH_GPT))
         {
-            Integer currentTokens = user.getTokensBalance();
-            GptModels currentModel = user.getGptModel();
-
             if (msg.equals(msgProperties.getProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty())))
             {
                 user.getMessageList().clear();
@@ -288,36 +304,53 @@ public class TelegramBot extends TelegramLongPollingBot
             else if (msg.equals(msgProperties.getProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty())))
             {
                 user.getMessageList().clear();
-                sendMessage(chatId, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty()),
-                        user.getGptModel().equals(GptModels.GPT3) ? msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
+                sendMessage(chatId, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty()), user.getGptModel().equals(GptModels.GPT3) ? msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT3_BUTTON_TITLE.getProperty()) : msgProperties.getProperty(PropertiesKeys.SETTINGS_GPT4_BUTTON_TITLE.getProperty())));
                 return;
             }
 
-            if (currentModel.equals(GptModels.GPT3))
-            {
-
-                ChatRequest chatRequest = new ChatRequest(this, user, msg, GptModels.GPT3);
-                chatRequest.sendNewChatRequest();
-
-            }
-            else if (currentModel.equals(GptModels.GPT4))
-            {
-                if (currentTokens > 0 && user.getIsVip())
-                {
-                    ChatRequest chatRequest = new ChatRequest(this, user, msg, GptModels.GPT4);
-                    chatRequest.sendNewChatRequest();
-                }
-                else
-                {
-                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NULL_BALANCE.getProperty()));
-                    user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
-                }
-            }
+            processChatRequest(user, msg);
         }
 
         else
         {
             sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty()));
+        }
+    }
+
+    private void handleVoices(TelegramBotUser user, Message message)
+    {
+        Properties msgProperties = user.getMsgProperties();
+        Long chatId = user.getChatId();
+
+        if (user.getIsVip())
+        {
+            if (user.getCurrentStatus().equals(UserStatus.USER_CHAT_WITH_GPT))
+            {
+                Voice voice = message.getVoice();
+
+                if (voice.getDuration() > 60)
+                {
+                    sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.ERROR_VOICE_DURATION_LIMIT.getProperty()));
+                    return;
+                }
+
+                String fileID = voice.getFileId();
+                String text = processVoiceMessageAndGetText(user, fileID);
+
+                if (text != null)
+                {
+                    sendMessage(chatId, ReplyMarkups.getPrevious(), String.format(msgProperties.getProperty(PropertiesKeys.CHAT_TRANSCRIPTION_RESULT.getProperty()), text));
+                    processChatRequest(user, text);
+                }
+            }
+            else
+            {
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty()));
+            }
+        }
+        else
+        {
+            sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.ERROR_NO_VOICE_ACCESS.getProperty()));
         }
     }
 
@@ -391,7 +424,7 @@ public class TelegramBot extends TelegramLongPollingBot
                 }
                 else
                 {
-                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty()));
+                    sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NO_GPT4_ACCESS.getProperty()));
                 }
             }
 
@@ -562,7 +595,7 @@ public class TelegramBot extends TelegramLongPollingBot
             }
 
             u.setTokensBalance(isTokensAdd ? u.getTokensBalance() + tokensVal : tokensVal);
-            u.setIsVip(isVip ? true : false);
+            u.setIsVip(isVip);
             DataSerializer.serializeUsersList();
             sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.APANEL_TOKENS_ADDED.getProperty()));
             user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
@@ -627,5 +660,69 @@ public class TelegramBot extends TelegramLongPollingBot
             msg = getMsgFromTxtFile(user, update.getMessage().getDocument());
         }
         return msg;
+    }
+
+    private java.io.File downloadVoiceFile(TelegramBotUser user, String fileID)
+    {
+        Properties msgProperties = user.getMsgProperties();
+        GetFile getFile = new GetFile(fileID);
+        Long chatId = user.getChatId();
+
+        File telegramFile = null;
+        try
+        {
+            telegramFile = execute(getFile);
+            String fileUrl = "https://api.telegram.org/file/bot" + getBotToken() + "/" + telegramFile.getFilePath();
+            URL url = new URL(fileUrl);
+
+            Path tempFile = Files.createTempFile(String.valueOf(user.getId()), ".ogg");
+
+            try (InputStream voiceStream = url.openStream())
+            {
+                Files.copy(voiceStream, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            }
+
+            return tempFile.toFile();
+        }
+        catch (TelegramApiException | IOException e)
+        {
+            sendMessage(chatId, ReplyMarkups.getPrevious(), msgProperties.getProperty(PropertiesKeys.ERROR_FAILED_TO_RECOGNIZE_SPEECH.getProperty()));
+            return null;
+        }
+    }
+
+    private String processVoiceMessageAndGetText(TelegramBotUser user, String fileID)
+    {
+        java.io.File file = downloadVoiceFile(user, fileID);
+        if (file != null)
+        {
+            return SpeechRecognition.recognizeSpeechFromVoiceFile(file);
+        }
+        return null;
+    }
+
+    private void processChatRequest(TelegramBotUser user, String msg)
+    {
+        Properties msgProperties = user.getMsgProperties();
+        Long chatId = user.getChatId();
+        Integer currentTokens = user.getTokensBalance();
+        GptModels currentModel = user.getGptModel();
+
+        if (currentModel.equals(GptModels.GPT3))
+        {
+            ChatRequest.sendNewChatRequest(this, user, msg, currentModel);
+        }
+        else if (currentModel.equals(GptModels.GPT4))
+        {
+            if (currentTokens > 0 && user.getIsVip())
+            {
+                ChatRequest.sendNewChatRequest(this, user, msg, currentModel);
+            }
+            else
+            {
+                sendMessage(chatId, ReplyMarkups.getEmpty(), msgProperties.getProperty(PropertiesKeys.ERROR_NULL_BALANCE.getProperty()));
+                user.setCurrentStatus(UserStatus.USER_MAIN_MENU);
+            }
+        }
     }
 }

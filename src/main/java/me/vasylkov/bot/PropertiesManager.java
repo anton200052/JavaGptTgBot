@@ -96,6 +96,7 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.CONFIG_BOT_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty(), "empty");
+        properties.setProperty(PropertiesKeys.CONFIG_SPEECH_TOKEN.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty(), "empty");
         properties.setProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty(), "empty");
@@ -114,6 +115,8 @@ public class PropertiesManager
                 || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty()).equals("empty")
                 || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty()) == null
                 || configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty()).equals("empty")
+                || configProperties.getProperty(PropertiesKeys.CONFIG_SPEECH_TOKEN.getProperty()) == null
+                || configProperties.getProperty(PropertiesKeys.CONFIG_SPEECH_TOKEN.getProperty()).equals("empty")
                 || configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()) == null
                 || configProperties.getProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty()).equals("empty")
                 || configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty()) == null
@@ -149,6 +152,9 @@ public class PropertiesManager
             System.out.println("Enter OpenAI GPT-4 token(it can be same as GPT-3.5 token):\n");
             properties.setProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty(), bufferedReader.readLine());
 
+            System.out.println("Enter OpenAI Speech Recognition token(it can be same as GPT-3.5 and GPT-4 tokens):\n");
+            properties.setProperty(PropertiesKeys.CONFIG_SPEECH_TOKEN.getProperty(), bufferedReader.readLine());
+
             System.out.println("Enter admins telegram id`s. Format: id1,id2,id3,id4\n");
             properties.setProperty(PropertiesKeys.CONFIG_ADMINS_ID.getProperty(), bufferedReader.readLine());
 
@@ -176,10 +182,18 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty(), "Чтобы задать вопрос боту используйте команду: /startchat");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty(), "Ошибка! Неправильный формат ввода. Вы можете либо написать сообщение боту, либо отправить ему txt файл и он прочитает из него.");
         properties.setProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty(), "Ошибка при парсинге");
-        properties.setProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty(), """
+        properties.setProperty(PropertiesKeys.ERROR_FAILED_TO_RECOGNIZE_SPEECH.getProperty(), "Ошибка транскрибции голосового сообщения. Попробуйте ещё раз.");
+        properties.setProperty(PropertiesKeys.ERROR_VOICE_DURATION_LIMIT.getProperty(), "‼️ Длительность голосового сообщения должна быть менее чем 60 секунд");
+        properties.setProperty(PropertiesKeys.ERROR_NO_GPT4_ACCESS.getProperty(), """
                 ❌ GPT-4 - это модель премиум-класса!
                                 
-                ⚪ Для её использования вам необходим статус Premium
+                ⚪ Для её использования вам необходим статус VIP
+                ⤷ /menu -> Баланс токенов
+                """);
+        properties.setProperty(PropertiesKeys.ERROR_NO_VOICE_ACCESS.getProperty(), """
+                ❌ Отправка голосовых сообщений это функция премиум-класса!
+                                
+                ⚪ Для её использования вам необходим статус VIP
                 ⤷ /menu -> Баланс токенов
                 """);
         properties.setProperty(PropertiesKeys.ERROR_NOT_ENOUGH_TOKENS.getProperty(), """
@@ -403,7 +417,16 @@ public class PropertiesManager
                 
                 ⚪️ Изменить модель:
                    ⤷ /menu - Настройки
+                   
+                💡 Приобретайте VIP-статус (/menu - Баланс), чтобы получить доступ к таким новинкам как:
+                   ⤷ 🤯 Задать вопрос боту голосовым сообщением. (Доступно более 100 языков)
+                   ⤷ 😮 Задать вопрос боту текстовым файлом
                 """);
+        properties.setProperty(PropertiesKeys.CHAT_TRANSCRIPTION_RESULT.getProperty(), """
+                💡 Ваш запрос:
+                 ⤷ %s
+                """);
+
 
         // Purchase
         properties.setProperty(PropertiesKeys.PURCHASE_MINIMAL_VALUE_BUTTON_TITLE.getProperty(), "\uD83D\uDFE3+25К токенов - 119 UAH (-40%)");
@@ -432,11 +455,19 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.ERROR_NOT_IN_CHAT.getProperty(), "To ask a question to the bot, use the command: /startchat");
         properties.setProperty(PropertiesKeys.ERROR_INCORRECT_INPUT.getProperty(), "Error! Incorrect input format. You can either send a message to the bot or send a txt file for it to read.");
         properties.setProperty(PropertiesKeys.ERROR_ADMIN_MODE_PARSE.getProperty(), "Parsing error");
-        properties.setProperty(PropertiesKeys.ERROR_NOT_PREMIUM_ACC.getProperty(), """
+        properties.setProperty(PropertiesKeys.ERROR_FAILED_TO_RECOGNIZE_SPEECH.getProperty(), "Failed to recognize voice file. Try again");
+        properties.setProperty(PropertiesKeys.ERROR_VOICE_DURATION_LIMIT.getProperty(), "‼️ The voice message duration should be less than 60 seconds.");
+        properties.setProperty(PropertiesKeys.ERROR_NO_GPT4_ACCESS.getProperty(), """
                 ❌ GPT-4 is a Premium model!
                                 
-                ⚪ To use it, you need to have Premium status
+                ⚪ To use it, you need to have VIP status
                 ⤷ /menu -> Tokens balance
+                """);
+        properties.setProperty(PropertiesKeys.ERROR_NO_VOICE_ACCESS.getProperty(), """
+                ❌ Sending voice messages is a Premium feature!
+                
+                ⚪ To use this function, you need VIP status.
+                ⤷ /menu -> Token balance
                 """);
         properties.setProperty(PropertiesKeys.ERROR_NOT_ENOUGH_TOKENS.getProperty(), """
                 You need to have more than 300 tokens on your balance to use GPT-4 🙁
@@ -642,12 +673,12 @@ public class PropertiesManager
                                 
                            
                 🟣GPT-4:
-                 ⤷
+                 ⤷🟢
                 🟢🟢🟢🟢🟢 – Smart
                                 
                 🟢🟢🟢🟢🟢 – Fast
                                 
-                🟢🟢⚪️⚪️⚪️ – Cheap
+                🟢⚪️⚪️⚪️ – Cheap
                                 
                 Select model:
                 """);
@@ -657,11 +688,19 @@ public class PropertiesManager
         properties.setProperty(PropertiesKeys.CHAT_END_CHAT_BUTTON_TITLE.getProperty(), "End chat \uD83D\uDCA7");
         properties.setProperty(PropertiesKeys.CHAT_START_NEW_BUTTON_TITLE.getProperty(), "Start new chat \uD83D\uDD25");
         properties.setProperty(PropertiesKeys.CHAT_START_GPT_CHAT.getProperty(), """
-                You've started a chat with model:
+                You've started a chat with the model:
                 %s
                 
                 ⚪️ Change the model:
                    ⤷ /menu - Settings
+                   
+                💡 Get VIP status (/menu - Balance) to access new features such as:
+                   ⤷ 🤯 Ask the bot a question with a voice message. (Available in over 100 languages)
+                   ⤷ 😮 Ask the bot a question with a text file
+                """);
+        properties.setProperty(PropertiesKeys.CHAT_TRANSCRIPTION_RESULT.getProperty(), """
+                💡 Your request:
+                 ⤷ %s
                 """);
 
 
@@ -697,9 +736,9 @@ public class PropertiesManager
     private static Properties loadExistProperties(Path path)
     {
         Properties properties = new Properties();
-        try (FileInputStream fileInputStream = new FileInputStream(path.toString()))
+        try (FileReader fileReader = new FileReader(path.toString()))
         {
-            properties.load(fileInputStream);
+            properties.load(fileReader);
         }
         catch (IOException e)
         {

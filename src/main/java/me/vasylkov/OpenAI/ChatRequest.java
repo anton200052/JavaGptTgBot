@@ -16,10 +16,6 @@ import java.util.Properties;
 
 public class ChatRequest
 {
-    private final TelegramBot instance;
-    private final TelegramBotUser user;
-    private final String message;
-    private final GptModels model;
     private static final Properties configProperties = PropertiesManager.getConfigProperties();
     private static final String GPT_3_VERSION = configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_VERSION.getProperty());
     private static final String GPT_4_VERSION = configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_VERSION.getProperty());
@@ -28,15 +24,7 @@ public class ChatRequest
     private static final String GPT_3_TOKEN = configProperties.getProperty(PropertiesKeys.CONFIG_GPT3_TOKEN.getProperty());
     private static final String GPT_4_TOKEN = configProperties.getProperty(PropertiesKeys.CONFIG_GPT4_TOKEN.getProperty());
 
-    public ChatRequest(TelegramBot instance, TelegramBotUser user, String message, GptModels model)
-    {
-        this.instance = instance;
-        this.user = user;
-        this.message = message;
-        this.model = model;
-    }
-
-    private void createChat()
+    private static void createChat(TelegramBot instance, TelegramBotUser user, String message, GptModels model)
     {
         Long chatId = user.getChatId();
         try
@@ -84,9 +72,9 @@ public class ChatRequest
         }
     }
 
-    public void sendNewChatRequest()
+    public static void sendNewChatRequest(TelegramBot instance, TelegramBotUser user, String message, GptModels model)
     {
-        Thread thread = new Thread(this::createChat);
+        Thread thread = new Thread(() -> createChat(instance, user, message, model));
         thread.start();
     }
 }
